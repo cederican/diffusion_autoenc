@@ -80,6 +80,26 @@ def adamw_weight_decay(conf: TrainConfig):
     return conf
 
 
+'''
+configuration function for the latent part
+'''
+def mri256_autoenc_latent():
+    conf = pretrain_mri256()
+    conf = latent_diffusion128_config(conf)
+    conf = latent_mlp_2048_norm_10layers(conf)
+    conf = latent_256_batch_size(conf)
+    conf = adamw_weight_decay(conf)
+    conf.total_samples =
+    conf.latent_loss_type = LossType.l1
+    conf.latent_beta_scheduler = 'const0.008'
+    conf.eval_ema_every_samples =
+    conf.eval_every_samples =
+    conf.sample_every_samples =
+    conf.name = 'mri256_autoenc_latent'
+    return conf
+
+
+
 def ffhq128_autoenc_latent():
     conf = pretrain_ffhq128_autoenc130M()
     conf = latent_diffusion128_config(conf)

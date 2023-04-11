@@ -57,49 +57,66 @@ def autoenc_base():
     conf.make_model_conf()
     return conf
 
+'''
+##############################################################################################################
+'''
+'''
+configuration function for 256x256 MRI scans
+'''
 
-def ffhq64_ddpm():
-    conf = ddpm()
-    conf.data_name = 'ffhqlmdb256'
-    conf.warmup = 0
-    conf.total_samples = 72_000_000
+def mri256_autoenc():
+    conf = autoenc_base()
+    conf.data_name = 'mrilmdb256'
     conf.scale_up_gpus(4)
+    conf.img_size = 256
+    conf.net_ch = 128
+    conf.net_ch_mult = (1, 1, 2, 2, 4, 4)
+    conf.net_enc_channel_mult = (1, 1, 2, 2, 4, 4, 4)
+    conf.eval_ema_every_samples =
+    conf.eval_every_samples =
+    conf.total_samples =
+    conf.batch_size = 64
+    conf.make_model_conf()
+    conf.name = 'mri256_autoenc'
     return conf
 
 
-def ffhq64_autoenc():
-    conf = autoenc_base()
-    conf.data_name = 'ffhqlmdb256'
+'''
+pretrain function, if checkpoints are available
+'''
+def pretrain_mri256():
+    conf = mri256_autoenc()
+    conf.pretrain = PretrainConfig(
+        name='10M',
+        path=f'checkpoints/{mri256_autoenc().name}/last.ckpt',
+    )
+    conf.latent_infer_path = f'checkpoints/{mri256_autoenc().name}/latent.pkl'
+    return conf
+
+'''
+ddpm config function
+'''
+def mri256_ddpm():
+    conf = ddpm()
+    conf.data_name = 'mrilmdb256'
     conf.warmup = 0
-    conf.total_samples = 72_000_000
-    conf.net_ch_mult = (1, 2, 4, 8)
-    conf.net_enc_channel_mult = (1, 2, 4, 8, 8)
-    conf.eval_every_samples = 1_000_000
-    conf.eval_ema_every_samples = 1_000_000
+    conf.total_samples =
+    conf.img_size = 256
+    conf.net_ch = 128
+    # channels:
+    # 3 => 128 * 1 => 128 * 1 => 128 * 2 => 128 * 3 => 128 * 4
+    # sizes:
+    # 128 => 128 => 64 => 32 => 16 => 8
+    conf.net_ch_mult = (1, 1, 2, 2, 4, 4)
+    conf.eval_every_samples =
+    conf.eval_ema_every_samples =
     conf.scale_up_gpus(4)
     conf.make_model_conf()
     return conf
 
-
-def celeba64d2c_ddpm():
-    conf = ffhq128_ddpm()
-    conf.data_name = 'celebalmdb'
-    conf.eval_every_samples = 10_000_000
-    conf.eval_ema_every_samples = 10_000_000
-    conf.total_samples = 72_000_000
-    conf.name = 'celeba64d2c_ddpm'
-    return conf
-
-
-def celeba64d2c_autoenc():
-    conf = ffhq64_autoenc()
-    conf.data_name = 'celebalmdb'
-    conf.eval_every_samples = 10_000_000
-    conf.eval_ema_every_samples = 10_000_000
-    conf.total_samples = 72_000_000
-    conf.name = 'celeba64d2c_autoenc'
-    return conf
-
+'''
+#################################################################################################################
+'''
 
 def ffhq128_ddpm():
     conf = ddpm()
@@ -197,46 +214,6 @@ def ffhq128_autoenc_130M():
     conf.eval_ema_every_samples = 10_000_000
     conf.eval_every_samples = 10_000_000
     conf.name = 'ffhq128_autoenc_130M'
-    return conf
-
-
-def horse128_ddpm():
-    conf = ffhq128_ddpm()
-    conf.data_name = 'horse256'
-    conf.total_samples = 130_000_000
-    conf.eval_ema_every_samples = 10_000_000
-    conf.eval_every_samples = 10_000_000
-    conf.name = 'horse128_ddpm'
-    return conf
-
-
-def horse128_autoenc():
-    conf = ffhq128_autoenc_base()
-    conf.data_name = 'horse256'
-    conf.total_samples = 130_000_000
-    conf.eval_ema_every_samples = 10_000_000
-    conf.eval_every_samples = 10_000_000
-    conf.name = 'horse128_autoenc'
-    return conf
-
-
-def bedroom128_ddpm():
-    conf = ffhq128_ddpm()
-    conf.data_name = 'bedroom256'
-    conf.eval_ema_every_samples = 10_000_000
-    conf.eval_every_samples = 10_000_000
-    conf.total_samples = 120_000_000
-    conf.name = 'bedroom128_ddpm'
-    return conf
-
-
-def bedroom128_autoenc():
-    conf = ffhq128_autoenc_base()
-    conf.data_name = 'bedroom256'
-    conf.eval_ema_every_samples = 10_000_000
-    conf.eval_every_samples = 10_000_000
-    conf.total_samples = 120_000_000
-    conf.name = 'bedroom128_autoenc'
     return conf
 
 
