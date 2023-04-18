@@ -64,43 +64,43 @@ def autoenc_base():
 configuration function for 256x256 MRI scans
 '''
 
-def mri256_autoenc():
+def mri_autoenc():
     conf = autoenc_base()
-    conf.data_name = 'mrilmdb256'
-    conf.scale_up_gpus(4)
+    conf.data_name = 'mrilmdb'
+    conf.scale_up_gpus(2)
     conf.img_size = 256
     conf.net_ch = 128
     conf.net_ch_mult = (1, 1, 2, 2, 4, 4)
     conf.net_enc_channel_mult = (1, 1, 2, 2, 4, 4, 4)
-    conf.eval_ema_every_samples =
-    conf.eval_every_samples =
-    conf.total_samples =
+    conf.eval_ema_every_samples = 500                # edit for dataset
+    conf.eval_every_samples = 500                    # edit for dataset
+    conf.total_samples = 6_000                       # edit for dataset
     conf.batch_size = 64
     conf.make_model_conf()
-    conf.name = 'mri256_autoenc'
+    conf.name = 'mri_autoenc'
     return conf
 
 
 '''
 pretrain function, if checkpoints are available
 '''
-def pretrain_mri256():
-    conf = mri256_autoenc()
+def pretrain_mri():
+    conf = mri_autoenc()
     conf.pretrain = PretrainConfig(
         name='10M',
-        path=f'checkpoints/{mri256_autoenc().name}/last.ckpt',
+        path=f'checkpoints/{mri_autoenc().name}/last.ckpt',
     )
-    conf.latent_infer_path = f'checkpoints/{mri256_autoenc().name}/latent.pkl'
+    conf.latent_infer_path = f'checkpoints/{mri_autoenc().name}/latent.pkl'
     return conf
 
 '''
 ddpm config function
 '''
-def mri256_ddpm():
+def mri_ddpm():
     conf = ddpm()
-    conf.data_name = 'mrilmdb256'
+    conf.data_name = 'mrilmdb'
     conf.warmup = 0
-    conf.total_samples =
+    conf.total_samples = 6_000                   # edit for dataset
     conf.img_size = 256
     conf.net_ch = 128
     # channels:
@@ -108,8 +108,8 @@ def mri256_ddpm():
     # sizes:
     # 128 => 128 => 64 => 32 => 16 => 8
     conf.net_ch_mult = (1, 1, 2, 2, 4, 4)
-    conf.eval_every_samples =
-    conf.eval_ema_every_samples =
+    conf.eval_every_samples = 500                # edit for dataset
+    conf.eval_ema_every_samples = 500            # edit for dataset
     conf.scale_up_gpus(4)
     conf.make_model_conf()
     return conf

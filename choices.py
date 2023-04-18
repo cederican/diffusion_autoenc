@@ -52,12 +52,21 @@ class ManipulateMode(Enum):
     """
     how to train the classifier to manipulate
     """
+    # train on the mri attr dataset
+    mri = 'mri'
+
     # train on whole celeba attr dataset
     celebahq_all = 'celebahq_all'
     # celeba with D2C's crop
     d2c_fewshot = 'd2cfewshot'
     d2c_fewshot_allneg = 'd2cfewshotallneg'
 
+
+    def is_mri(self):
+        return self in [
+            ManipulateMode.mri,
+        ]
+    
     def is_celeba_attr(self):
         return self in [
             ManipulateMode.d2c_fewshot,

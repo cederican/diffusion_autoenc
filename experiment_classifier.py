@@ -67,6 +67,8 @@ class ClsModel(pl.LightningModule):
             num_cls = len(CelebAttrDataset.id_to_cls)
         elif conf.manipulate_mode.is_single_class():
             num_cls = 1
+        elif conf.manipulate_mode.is_mri():
+            num_cls = len(MriAttrDataset.id_to_cls)
         else:
             raise NotImplementedError()
 
@@ -154,6 +156,16 @@ class ClsModel(pl.LightningModule):
                                       self.conf.img_size,
                                       data_paths['celebahq_anno'],
                                       do_augment=True)
+        
+        # load mri dataset ##############################################################################
+
+        elif self.conf.manipulate_mode == ManipulateMode.mri:
+            return MriAttrDataset(data_paths['mrilmdb'],
+                                  self.conf.img_size,
+                                  data_paths['mri_anno'],
+                                  do_augment=True)
+    
+
         else:
             raise NotImplementedError()
 

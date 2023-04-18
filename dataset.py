@@ -139,6 +139,68 @@ def make_transform(
     return transform
 
 
+'''
+######################################################################################################
+dataset class for MRI data
+'''
+class MRIlmdb(Dataset):
+    def __init__(self,
+                 path = os.path.expanduser('datasets/mri256.lmdb'),
+                 image_size = 256,
+                 original_resolution = 256,
+                 split = None,
+                 as_tensor: bool = True,
+                 do_augment: bool = True,
+                 do_normalize: bool = True,
+                 **kwargs):
+        self.original_resolution = original_resolution
+        self.data = BaseLMDB(path, original_resolution, zfill=5)
+        self.length = len(self.data)
+
+        if split is None:
+            self.offset = 0
+        elif split == 'train':
+            # specify the split
+            # last 5500
+            self.length = self.length - 500
+            self.offset = 500
+        elif split == 'test':
+            # first 500
+            self.length = 500
+            self.offset = 0
+        else:
+            raise NotImplementedError()
+
+        transform = [
+            transforms.Resize(image_size),
+        ]
+        if do_augment:
+            transform.append(transforms.RandomHorizontalFlip())
+        if as_tensor:
+            transform.append(transforms.ToTensor())
+        if do_normalize:
+            transform.append(
+                transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)))
+        self.transform = transforms.Compose(transform)
+
+    def __len__(self):
+        return self.length
+
+    def __getitem__(self, index):
+        assert index < self.length
+        index = index + self.offset
+        img = self.data[index]
+        if self.transform is not None:
+            img = self.transform(img)
+        return {'img': img, 'index': index}
+
+'''
+#########################################################################################################################
+'''
+
+
+
+
 class FFHQlmdb(Dataset):
     def __init__(self,
                  path=os.path.expanduser('datasets/ffhq256.lmdb'),
@@ -345,6 +407,81 @@ class Bedroom_lmdb(Dataset):
         img = self.transform(img)
         return {'img': img, 'index': index}
 
+
+'''
+################################################################################################################
+mri attr dataset class
+'''
+class MriAttrDataset(Dataset):
+
+    id_to_cls = [
+
+        # attribute zum klassifizieren
+    ]
+    cls_to_id = {v: k for k, v in enumerate(id_to_cls)}
+
+    def __init__(self,
+             path=os.path.expanduser('datasets/MRNet.lmdb'),
+             image_size=None,
+             attr_path=os.path.expanduser(
+                 'datasets/list_attr_mri.txt'),
+             original_resolution=256,
+             do_augment: bool = False,
+             do_transform: bool = True,
+             do_normalize: bool = True):
+        
+        super().__init__()
+        self.image_size = image_size
+        self.data = BaseLMDB(path, original_resolution, zfill=5)
+
+        transform = [
+            transforms.Resize(image_size),
+            transforms.CenterCrop(image_size),
+        ]
+        if do_augment:
+            transform.append(transforms.RandomHorizontalFlip())
+        if do_transform:
+            transform.append(transforms.ToTensor())
+        if do_normalize:
+            transform.append(
+                transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)))
+        self.transform = transforms.Compose(transform)
+
+        with open(attr_path) as f:
+            # discard the top line
+            f.readline()
+            self.df = pd.read_csv(f, delim_whitespace=True)
+
+
+    def pos_count(self, cls_name):
+        return (self.df[cls_name] == 1).sum()
+
+
+    def neg_count(self, cls_name):
+        return (self.df[cls_name] == -1).sum()
+
+
+    def __len__(self):
+        return len(self.df)
+
+
+    def __getitem__(self, index):
+        row = self.df.iloc[index]
+        img_name = row.name
+        img_idx, ext = img_name.split('.')
+        img = self.data[img_idx]
+
+        labels = [0] * len(self.id_to_cls)
+        for k, v in row.items():
+            labels[self.cls_to_id[k]] = int(v)
+
+        if self.transform is not None:
+            img = self.transform(img)
+        return {'img': img, 'index': index, 'labels': torch.tensor(labels)}
+
+'''
+#########################################################################################################
+'''
 
 class CelebAttrDataset(Dataset):
 

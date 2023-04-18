@@ -2,6 +2,7 @@ import copy
 import json
 import os
 import re
+import wandb
 
 import numpy as np
 import pandas as pd
@@ -9,6 +10,7 @@ import pytorch_lightning as pl
 import torch
 from numpy.lib.function_base import flip
 from pytorch_lightning import loggers as pl_loggers
+from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.callbacks import *
 from torch import nn
 from torch.cuda import amp
@@ -375,6 +377,7 @@ class LitModel(pl.LightningModule):
                 losses = self.sampler.training_losses(model=self.model,
                                                       x_start=x_start,
                                                       t=t)
+                
             elif self.conf.train_mode.is_latent_diffusion():
                 """
                 training the latent variables!
@@ -392,6 +395,8 @@ class LitModel(pl.LightningModule):
                 raise NotImplementedError()
 
             loss = losses['loss'].mean()
+
+
             # divide by accum batches to make the accumulated gradient exact!
             for key in ['loss', 'vae', 'latent', 'mmd', 'chamfer', 'arg_cnt']:
                 if key in losses:
@@ -898,6 +903,7 @@ def train(conf: TrainConfig, gpus, nodes=1, mode: str = 'train'):
             resume = conf.continue_from.path
         else:
             resume = None
+    
 
     tb_logger = pl_loggers.TensorBoardLogger(save_dir=conf.logdir,
                                              name=None,
@@ -959,6 +965,9 @@ def train(conf: TrainConfig, gpus, nodes=1, mode: str = 'train'):
             for k, v in out.items():
                 tb_logger.experiment.add_scalar(
                     k, v, state['global_step'] * conf.batch_size_effective)
+                
+            # save to wandb
+            wandb.log(out, step = state['global_step'])
 
             # # save to file
             # # make it a dict of list

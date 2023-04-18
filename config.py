@@ -39,6 +39,13 @@ data_paths = {
         'datasets/celeba_anno/CelebAMask-HQ-attribute-anno.txt'),
     'celeba_relight':
     os.path.expanduser('datasets/celeba_hq_light/celeba_light.txt'),
+
+    #link to the MRI lmdb dataset
+    'mrilmdb':
+    os.path.expanduser('datasets/MRNet.lmdb'),
+    #link to the labeled MRI .txt file
+    'mri_anno':
+    os.path.expanduser('datasets/list_attr_mri.txt'),
 }
 
 
@@ -301,6 +308,10 @@ class TrainConfig(BaseConfig):
                               original_resolution=None,
                               crop_d2c=True,
                               **kwargs)
+        elif self.data_name == 'mrilmdb':
+            return MRIlmdb(path=path or self.data_path,
+                           image_size = self.img_size,
+                           **kwargs)
         else:
             raise NotImplementedError()
 
