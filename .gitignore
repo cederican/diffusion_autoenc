@@ -1,2 +1,3 @@
 .conda/
 datasets/
+__pycache__/
