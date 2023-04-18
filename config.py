@@ -72,7 +72,7 @@ class TrainConfig(BaseConfig):
     manipulate_seed: int = 0
     accum_batches: int = 1
     autoenc_mid_attn: bool = True
-    batch_size: int = 16
+    batch_size: int = 2
     batch_size_eval: int = None
     beatgans_gen_type: GenerativeType = GenerativeType.ddim
     beatgans_loss_type: LossType = LossType.mse

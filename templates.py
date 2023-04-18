@@ -75,7 +75,7 @@ def mri_autoenc():
     conf.eval_ema_every_samples = 500                # edit for dataset
     conf.eval_every_samples = 500                    # edit for dataset
     conf.total_samples = 6_000                       # edit for dataset
-    conf.batch_size = 64
+    conf.batch_size = 8
     conf.make_model_conf()
     conf.name = 'mri_autoenc'
     return conf
