@@ -72,7 +72,7 @@ class TrainConfig(BaseConfig):
     manipulate_seed: int = 0
     accum_batches: int = 1
     autoenc_mid_attn: bool = True
-    batch_size: int = 2
+    batch_size: int = 4
     batch_size_eval: int = None
     beatgans_gen_type: GenerativeType = GenerativeType.ddim
     beatgans_loss_type: LossType = LossType.mse
@@ -146,7 +146,7 @@ class TrainConfig(BaseConfig):
     # number of resblocks for the UNET
     net_num_input_res_blocks: int = None
     net_enc_num_cls: int = None
-    num_workers: int = 4
+    num_workers: int = 48
     parallel: bool = False
     postfix: str = ''
     sample_size: int = 64

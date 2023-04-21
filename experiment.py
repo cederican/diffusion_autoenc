@@ -930,7 +930,7 @@ def train(conf: TrainConfig, gpus, nodes=1, mode: str = 'train'):
         precision=16 if conf.fp16 else 32,
         callbacks=[
             checkpoint,
-            LearningRateMonitor(),
+            # LearningRateMonitor(),
         ],
         # clip in the model instead
         # gradient_clip_val=conf.grad_clip,
@@ -967,7 +967,7 @@ def train(conf: TrainConfig, gpus, nodes=1, mode: str = 'train'):
                     k, v, state['global_step'] * conf.batch_size_effective)
                 
             # save to wandb
-            wandb.log(out, step = state['global_step'])
+            #wandb.log(out, step = state['global_step'])
 
             # # save to file
             # # make it a dict of list

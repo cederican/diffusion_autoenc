@@ -13,9 +13,9 @@ def mri_autoenc_cls():
     conf.manipulate_mode = ManipulateMode.mri
     conf.manipulate_znormalize = True
     conf.latent_infer_path = f'checkpoints/{mri_autoenc().name}/latent.pkl'
-    conf.batch_size = 32
+    conf.batch_size = 8            #edit for dataset
     conf.lr = 1e-3
-    conf.total_samples = 300_000
+    conf.total_samples = 6_000      #edit for dataset
     # use the pretraining trick instead of contiuning trick
     conf.pretrain = PretrainConfig(
         '130M',

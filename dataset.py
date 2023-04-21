@@ -146,8 +146,8 @@ dataset class for MRI data
 class MRIlmdb(Dataset):
     def __init__(self,
                  path = os.path.expanduser('datasets/mri256.lmdb'),
-                 image_size = 256,
-                 original_resolution = 256,
+                 image_size = 128,              #edit for 128 or 256
+                 original_resolution = 128,     #edit for 128 or 256
                  split = None,
                  as_tensor: bool = True,
                  do_augment: bool = True,
@@ -160,12 +160,12 @@ class MRIlmdb(Dataset):
         if split is None:
             self.offset = 0
         elif split == 'train':
-            # specify the split
-            # last 5500
+            # specify the split                     #edit for dataset
+            # last 900
             self.length = self.length - 500
             self.offset = 500
         elif split == 'test':
-            # first 500
+            # first 100
             self.length = 500
             self.offset = 0
         else:

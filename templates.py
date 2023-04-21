@@ -67,19 +67,19 @@ configuration function for 256x256 MRI scans
 def mri_autoenc():
     conf = autoenc_base()
     conf.data_name = 'mrilmdb'
-    conf.scale_up_gpus(2)
-    conf.img_size = 256
+    conf.img_size = 128                                    #edit for 128 or 256
     conf.net_ch = 128
-    conf.net_ch_mult = (1, 1, 2, 2, 4, 4)
-    conf.net_enc_channel_mult = (1, 1, 2, 2, 4, 4, 4)
-    conf.eval_ema_every_samples = 500                # edit for dataset
-    conf.eval_every_samples = 500                    # edit for dataset
-    conf.total_samples = 6_000                       # edit for dataset
+    conf.net_ch_mult = (1, 1, 2, 3, 4)                     #edit for 128 or 256
+    conf.net_enc_channel_mult = (1, 1, 2, 3, 4, 4)         #edit for 128 or 256
+    conf.eval_ema_every_samples = 1000                      # edit for dataset
+    conf.eval_every_samples = 1000
+    conf.eval_num_images = 50                              # how many images for FID Score
+    conf.total_samples = 6_000                             # edit for dataset
     conf.batch_size = 8
+    conf.scale_up_gpus(2)
     conf.make_model_conf()
     conf.name = 'mri_autoenc'
     return conf
-
 
 '''
 pretrain function, if checkpoints are available
@@ -101,13 +101,13 @@ def mri_ddpm():
     conf.data_name = 'mrilmdb'
     conf.warmup = 0
     conf.total_samples = 6_000                   # edit for dataset
-    conf.img_size = 256
+    conf.img_size = 128                         #edit for minor
     conf.net_ch = 128
     # channels:
     # 3 => 128 * 1 => 128 * 1 => 128 * 2 => 128 * 3 => 128 * 4
     # sizes:
     # 128 => 128 => 64 => 32 => 16 => 8
-    conf.net_ch_mult = (1, 1, 2, 2, 4, 4)
+    conf.net_ch_mult = (1, 1, 2, 3, 4)  
     conf.eval_every_samples = 500                # edit for dataset
     conf.eval_ema_every_samples = 500            # edit for dataset
     conf.scale_up_gpus(4)

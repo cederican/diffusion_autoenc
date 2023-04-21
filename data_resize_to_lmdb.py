@@ -109,7 +109,7 @@ if __name__ == "__main__":
     resample_map = {"lanczos": Image.LANCZOS, "bilinear": Image.BILINEAR}
     resample = resample_map['lanczos']
 
-    sizes = [256]
+    sizes = [128]
 
     print(f"Make dataset of image sizes:", ", ".join(str(s) for s in sizes))
 

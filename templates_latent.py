@@ -93,9 +93,10 @@ def mri_autoenc_latent():
     conf.total_samples = 6_000                       # edit for dataset
     conf.latent_loss_type = LossType.l1
     conf.latent_beta_scheduler = 'const0.008'
-    conf.eval_ema_every_samples = 500                # edit for dataset
-    conf.eval_every_samples = 500                    # edit for dataset
-    conf.sample_every_samples = 300                  # edit for dataset
+    conf.eval_ema_every_samples = 1000                # edit for dataset
+    conf.eval_every_samples = 1000                    # edit for dataset
+    conf.sample_every_samples = 50                  # edit for dataset
+    conf.eval_num_images = 50  
     conf.name = 'mri_autoenc_latent'
     return conf
 

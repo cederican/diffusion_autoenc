@@ -1,12 +1,27 @@
-#!/bin/sh
-#SBATCH --job-name=diffae_test          # Name des Jobs auf dem Cluster
-#SBATCH --output=output_diffae.log      # Ausgabedatei
-#SBATCH --error=errors_diffae.log       # Fehlerdatei
+#!/usr/bin/zsh
+
+#SBATCH --job-name=diffae_autoenc
+#SBATCH --output=output.log
+#SBATCH --error=errors.log
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
 #SBATCH --gres=gpu:2
-#SBATCH --time=1:00:00
+#SBATCH --mem-per-gpu=16GB
+#SBATCH --time=01:00:00   
+
+module load cuda
+
+# Insert this AFTER the #SLURM argument section of your job script
+export CONDA_ROOT=$HOME/anaconda3
+. $CONDA_ROOT/etc/profile.d/conda.sh
+export PATH="$CONDA_ROOT/bin:$PATH"
+# Now you can activate your configured conda environments
+conda activate diffautoenc
+
+echo; export; echo; nvidia-smi; echo
+
 
 export NCCL_DEBUG=INFO
 export PYTHONFAULTHANDLER=1
 
-
-srun --time=1:00:00 --gres=gpu:volta:2 python run_mri.py
+srun python run_mri.py
