@@ -73,7 +73,7 @@ def mri_autoenc():
     conf.net_enc_channel_mult = (1, 1, 2, 3, 4, 4)         #edit for 128 or 256
     conf.eval_ema_every_samples = 1000                      # edit for dataset
     conf.eval_every_samples = 1000
-    conf.eval_num_images = 50                              # how many images for FID Score
+    conf.eval_num_images = 100                              # how many images for FID Score
     conf.total_samples = 6_000                             # edit for dataset
     conf.batch_size = 8
     conf.scale_up_gpus(2)

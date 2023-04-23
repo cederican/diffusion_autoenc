@@ -15,6 +15,7 @@ if __name__ == '__main__':
     #gpus = [0, 1]
     #conf = mri_autoenc()
     #train(conf, gpus=gpus)
+    #print("finished")
 
     
     '''

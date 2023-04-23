@@ -27,6 +27,7 @@ from metrics import *
 from renderer import *
 
 
+
 class LitModel(pl.LightningModule):
     def __init__(self, conf: TrainConfig):
         super().__init__()
@@ -35,6 +36,7 @@ class LitModel(pl.LightningModule):
             pl.seed_everything(conf.seed)
 
         self.save_hyperparameters(conf.as_dict_jsonable())
+        #self.save_hyperparameters()                             #wandb edit
 
         self.conf = conf
 
@@ -403,12 +405,12 @@ class LitModel(pl.LightningModule):
                     losses[key] = self.all_gather(losses[key]).mean()
 
             if self.global_rank == 0:
-                self.logger.experiment.add_scalar('loss', losses['loss'],
-                                                  self.num_samples)
+                #self.logger.log('loss', losses['loss'], self.num_samples)  #wandb edit
+                self.logger.experiment.add_scalar('loss', losses['loss'],self.num_samples)
                 for key in ['vae', 'latent', 'mmd', 'chamfer', 'arg_cnt']:
                     if key in losses:
-                        self.logger.experiment.add_scalar(
-                            f'loss/{key}', losses[key], self.num_samples)
+                        #self.logger.log(f'loss/{key}', losses[key], self.num_samples)  #wandb edit
+                        self.logger.experiment.add_scalar(f'loss/{key}', losses[key], self.num_samples)
 
         return {'loss': loss}
 
@@ -432,7 +434,7 @@ class LitModel(pl.LightningModule):
                 imgs = None
             else:
                 imgs = batch['img']
-            self.log_sample(x_start=imgs)
+            self.log_sample(x_start=imgs)      #wandb edit
             self.evaluate_scores()
 
     def on_before_optimizer_step(self, optimizer: Optimizer,
@@ -921,6 +923,8 @@ def train(conf: TrainConfig, gpus, nodes=1, mode: str = 'train'):
         # important for working with gradient checkpoint
         plugins.append(DDPPlugin(find_unused_parameters=False))
 
+    wandb_logger = WandbLogger(project="test_wandb_project", name="test_wandb_name")        #wandb edit
+
     trainer = pl.Trainer(
         max_steps=conf.total_samples // conf.batch_size_effective,
         resume_from_checkpoint=resume,
@@ -935,7 +939,7 @@ def train(conf: TrainConfig, gpus, nodes=1, mode: str = 'train'):
         # clip in the model instead
         # gradient_clip_val=conf.grad_clip,
         replace_sampler_ddp=True,
-        logger=tb_logger,
+        logger=tb_logger,                      #wandb edit
         accumulate_grad_batches=conf.accum_batches,
         plugins=plugins,
     )
@@ -966,8 +970,7 @@ def train(conf: TrainConfig, gpus, nodes=1, mode: str = 'train'):
                 tb_logger.experiment.add_scalar(
                     k, v, state['global_step'] * conf.batch_size_effective)
                 
-            # save to wandb
-            #wandb.log(out, step = state['global_step'])
+           
 
             # # save to file
             # # make it a dict of list

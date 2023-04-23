@@ -5,3 +5,4 @@ __pycache__/
 **/checkpoints/mri_autoenc_latent/events.out.tfevents*
 checkpoints/
 evals/
+wandb/

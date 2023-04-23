@@ -24,7 +24,7 @@ def save_slices_as_png(input_dir, output_dir):
                     file_list.append(os.path.join(orientation_type_path, file_name))
 
     # Iterate through the list of files and save each slice as a separate .png file
-    for file_path in tqdm(file_list[:200]):  # loop through only the first 10 files
+    for file_path in tqdm(file_list[:1]):  # loop through only the first 10 files
         # Load the .npy file
         image_data = np.load(file_path)
 
