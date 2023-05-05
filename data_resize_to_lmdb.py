@@ -16,7 +16,7 @@ def resize_and_convert(img, size, resample, quality=100):
     img = trans_fn.resize(img, size, resample)
     img = trans_fn.center_crop(img, size)
     buffer = BytesIO()
-    img.save(buffer, format="jpeg", quality=quality)
+    img.save(buffer, format="png", quality=quality)
     val = buffer.getvalue()
 
     return val
@@ -37,7 +37,7 @@ def resize_multiple(img,
 def resize_worker(img_file, sizes, resample):
     i, (file, idx) = img_file
     img = Image.open(file)
-    img = img.convert("RGB")
+    #img = img.convert("L")
     out = resize_multiple(img, sizes=sizes, resample=resample)
 
     return i, idx, out
@@ -78,7 +78,7 @@ def prepare(env,
 
 
 class ImageFolder(Dataset):
-    def __init__(self, folder, exts=['jpg']):
+    def __init__(self, folder, exts=['png']):
         super().__init__()
         self.paths = [
             p for ext in exts for p in Path(f'{folder}').glob(f'**/*.{ext}')

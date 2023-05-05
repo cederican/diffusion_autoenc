@@ -21,9 +21,10 @@ def find_nifti_files(input_dir, output_dir):
     
 
     # Iterate through the list of files and save each slice as a separate .png file
-    for file_path in tqdm(nifti_files[:3]):  # loop through only the first 10 files
+    for file_path in tqdm(nifti_files[:50]):  # loop through only the first 10 files
         # Load the .nifti file
         nii_data = nib.load(file_path).get_fdata()
+        nii_data= np.clip((nii_data - np.min(nii_data)) / (np.max(nii_data) - np.min(nii_data)), 0, 1)
         nii_data_header = nib.load(file_path).header
         print(nii_data_header)
         print(file_path)
@@ -44,7 +45,7 @@ def find_nifti_files(input_dir, output_dir):
             
             # then crop the image horizontally to get two images out of it 
             # Öffnen des Originalbildes
-            image = Image.fromarray(slice_data)
+            image = Image.fromarray((slice_data * 255).astype(np.uint8))
 
             #graustufenbild
             image = image.convert('L')

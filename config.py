@@ -72,7 +72,7 @@ class TrainConfig(BaseConfig):
     manipulate_seed: int = 0
     accum_batches: int = 1
     autoenc_mid_attn: bool = True
-    batch_size: int = 4
+    batch_size: int = 8
     batch_size_eval: int = None
     beatgans_gen_type: GenerativeType = GenerativeType.ddim
     beatgans_loss_type: LossType = LossType.mse
@@ -95,7 +95,7 @@ class TrainConfig(BaseConfig):
     diffusion_type: str = None
     dropout: float = 0.1
     ema_decay: float = 0.9999
-    eval_num_images: int = 5_000
+    eval_num_images: int = 10                  # edit für sampling score
     eval_every_samples: int = 200_000
     eval_ema_every_samples: int = 200_000
     fid_use_torch: bool = True
@@ -150,7 +150,7 @@ class TrainConfig(BaseConfig):
     parallel: bool = False
     postfix: str = ''
     sample_size: int = 64
-    sample_every_samples: int = 20_000
+    sample_every_samples: int = 100_000
     save_every_samples: int = 100_000
     style_ch: int = 512
     T_eval: int = 1_000

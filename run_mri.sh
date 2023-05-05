@@ -1,15 +1,13 @@
 #!/usr/bin/zsh
 
 #SBATCH --job-name=diffae_autoenc
-#SBATCH --output=output.log
-#SBATCH --error=errors.log
-#SBATCH --nodes=1
-#SBATCH --ntasks-per-node=1
+#SBATCH --output=outputdpm.log
+#SBATCH --error=errorsdpm.log
 #SBATCH --gres=gpu:2
 #SBATCH --mem-per-gpu=16GB
-#SBATCH --time=01:00:00   
+#SBATCH --time=4:00:00   
 
-module load cuda
+module load CUDA
 
 # Insert this AFTER the #SLURM argument section of your job script
 export CONDA_ROOT=$HOME/anaconda3

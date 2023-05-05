@@ -14,7 +14,7 @@ def save_slices_as_png(input_dir, output_dir):
         if not os.path.isdir(folder_path):
             continue
         for orientation_type in ["axial", "coronal", "sagittal"]:
-            if not orientation_type == "coronal":
+            if not orientation_type == "sagittal":
                 continue
             orientation_type_path = os.path.join(folder_path, orientation_type)
             if not os.path.isdir(orientation_type_path):
@@ -24,9 +24,10 @@ def save_slices_as_png(input_dir, output_dir):
                     file_list.append(os.path.join(orientation_type_path, file_name))
 
     # Iterate through the list of files and save each slice as a separate .png file
-    for file_path in tqdm(file_list[:1]):  # loop through only the first 10 files
+    for file_path in tqdm(file_list):  # loop through only the first 10 files
         # Load the .npy file
         image_data = np.load(file_path)
+        
 
         # Get the metadata
         file_name = os.path.basename(file_path)
@@ -40,10 +41,14 @@ def save_slices_as_png(input_dir, output_dir):
             #slice_name = f"{orientation_name}_{name}_{index_str}.png"
             slice_name = f"{index_str}.png"
             slice_path = os.path.join(output_dir, slice_name)
-            cv2.imwrite(slice_path, image_data[i])
+            #AE benötigt 3 channel, dupliziere gray in 3 channel
+            img_3ch = np.stack([image_data[i]] * 3, axis=2)
+            cv2.imwrite(slice_path, img_3ch)
             index += 1
+    
+    
 
 
 data_dir = "/home/yv312705/Code/diffusion_autoenc/datasets/MRNet-v1.0"
-out_dir = "/home/yv312705/Code/diffusion_autoenc/datasets/MRNet_png"
+out_dir = "/home/yv312705/Code/diffusion_autoenc/datasets/MRNet_png_sagittal"
 save_slices_as_png(data_dir, out_dir)

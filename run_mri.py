@@ -34,12 +34,13 @@ if __name__ == '__main__':
     gpus = [0]
     conf = mri_autoenc_latent()
     train(conf, gpus=gpus)
+    print("finished")
 
     '''
     unconditional sampling score
     NOTE: a lot of gpus can speed up this process
     '''
-    #gpus = [0, 1]  
+    #gpus = [0]  
     #conf = mri_autoenc_latent()     
     #conf.eval_programs = ['fid(10,10)']
     #train(conf, gpus=gpus, mode='eval')

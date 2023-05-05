@@ -145,7 +145,7 @@ dataset class for MRI data
 '''
 class MRIlmdb(Dataset):
     def __init__(self,
-                 path = os.path.expanduser('datasets/mri256.lmdb'),
+                 path = os.path.expanduser('datasets/MRNet.lmdb'),
                  image_size = 128,              #edit for 128 or 256
                  original_resolution = 128,     #edit for 128 or 256
                  split = None,
