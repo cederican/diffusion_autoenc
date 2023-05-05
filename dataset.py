@@ -417,6 +417,7 @@ class MriAttrDataset(Dataset):
     id_to_cls = [
 
         # attribute zum klassifizieren
+        't1_weighted', 't2_weighted', 'pd_weighted'
     ]
     cls_to_id = {v: k for k, v in enumerate(id_to_cls)}
 
@@ -425,7 +426,7 @@ class MriAttrDataset(Dataset):
              image_size=None,
              attr_path=os.path.expanduser(
                  'datasets/list_attr_mri.txt'),
-             original_resolution=256,
+             original_resolution=128,
              do_augment: bool = False,
              do_transform: bool = True,
              do_normalize: bool = True):

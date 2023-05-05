@@ -256,6 +256,10 @@ class ClsModel(pl.LightningModule):
         if self.conf.manipulate_mode.is_celeba_attr():
             gt = torch.where(labels > 0,
                              torch.ones_like(labels).float(),
+                             torch.zeros_like(labels).float())   
+        elif self.conf.manipulate_mode.is_mri():
+            gt = torch.where(labels > 0,
+                             torch.ones_like(labels).float(),
                              torch.zeros_like(labels).float())
         elif self.conf.manipulate_mode == ManipulateMode.relighting:
             gt = labels

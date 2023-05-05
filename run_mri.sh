@@ -1,9 +1,9 @@
 #!/usr/bin/zsh
 
 #SBATCH --job-name=diffae_autoenc
-#SBATCH --output=outputdpm.log
-#SBATCH --error=errorsdpm.log
-#SBATCH --gres=gpu:2
+#SBATCH --output=outputcls.log
+#SBATCH --error=errorscls.log
+#SBATCH --gres=gpu:1
 #SBATCH --mem-per-gpu=16GB
 #SBATCH --time=4:00:00   
 
@@ -22,4 +22,4 @@ echo; export; echo; nvidia-smi; echo
 export NCCL_DEBUG=INFO
 export PYTHONFAULTHANDLER=1
 
-srun python run_mri.py
+srun python run_mri_cls.py
