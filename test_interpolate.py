@@ -63,7 +63,7 @@ if antwort.lower() == "ja":
     if not os.path.exists(pfad):
         os.makedirs(pfad)
 
-    plt.savefig(pfad + "interpolate50M37K_test.png")
+    plt.savefig(pfad + "interpolate50M37K_sagaxi.png")
     print("Figur wurde gespeichert!")
 else:
     print("Figur wurde nicht gespeichert.")

@@ -64,7 +64,7 @@ if antwort.lower() == "ja":
     if not os.path.exists(pfad):
         os.makedirs(pfad)
 
-    plt.savefig(pfad + "classifier.png")
+    plt.savefig(pfad + "classifier_t2.png")
     print("Figur wurde gespeichert!")
 else:
     print("Figur wurde nicht gespeichert.")

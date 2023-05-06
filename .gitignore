@@ -8,3 +8,5 @@ evals/
 wandb/
 *.log
 *.png
+netron_modell.*
+netron_model.*

@@ -14,8 +14,8 @@ print(model.load_state_dict(state['state_dict'], strict=False))
 model.to(device)
 
 # sample images
-torch.manual_seed(2)
-imgs = model.sample(8, device=device, T=20, T_latent=200)
+torch.manual_seed(0)
+imgs = model.sample(8, device=device, T=1000, T_latent=200)
 
 # plot the generated samples
 fig, ax = plt.subplots(2, 4, figsize=(4*5, 2*5))
@@ -34,7 +34,7 @@ if antwort.lower() == "ja":
     if not os.path.exists(pfad):
         os.makedirs(pfad)
 
-    plt.savefig(pfad + "dpm_sample50M37K_1.png")
+    plt.savefig(pfad + "dpm_sampleT1000.png")
     print("Figur wurde gespeichert!")
 else:
     print("Figur wurde nicht gespeichert.")
