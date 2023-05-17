@@ -1,5 +1,3 @@
-
-
 import numpy as np
 import os
 import cv2
@@ -14,7 +12,7 @@ def save_slices_as_png(input_dir, output_dir):
         if not os.path.isdir(folder_path):
             continue
         for orientation_type in ["axial", "coronal", "sagittal"]:
-            if not orientation_type == "sagittal":
+            if not orientation_type == "axial":
                 continue
             orientation_type_path = os.path.join(folder_path, orientation_type)
             if not os.path.isdir(orientation_type_path):
@@ -24,7 +22,7 @@ def save_slices_as_png(input_dir, output_dir):
                     file_list.append(os.path.join(orientation_type_path, file_name))
 
     # Iterate through the list of files and save each slice as a separate .png file
-    for file_path in tqdm(file_list):  # loop through only the first 10 files
+    for file_path in tqdm(file_list[:450]):  # loop through only the first 10 files
         # Load the .npy file
         image_data = np.load(file_path)
         
@@ -43,6 +41,28 @@ def save_slices_as_png(input_dir, output_dir):
             slice_path = os.path.join(output_dir, slice_name)
             #AE benötigt 3 channel, dupliziere gray in 3 channel
             img_3ch = np.stack([image_data[i]] * 3, axis=2)
+
+            # Bilder random um 90 Grad drehen und/oder spiegeln
+            k = np.random.randint(4)
+            img_3ch = np.rot90(img_3ch, k)
+
+            if np.random.randint(2) == 1:
+                img_3ch = np.fliplr(img_3ch)
+
+
+            if np.random.randint(2) == 1:
+                img_3ch = np.flipud(img_3ch)
+
+
+            cv2.imwrite(slice_path, img_3ch)
+            index += 1
+
+            #noch ein bild erzeugen nur geflippt
+            index_str = "{:05d}".format(index)
+            slice_name = f"{index_str}.png"
+            slice_path = os.path.join(output_dir, slice_name)
+
+            img_3ch = np.fliplr(img_3ch)
             cv2.imwrite(slice_path, img_3ch)
             index += 1
     
@@ -50,5 +70,5 @@ def save_slices_as_png(input_dir, output_dir):
 
 
 data_dir = "/home/yv312705/Code/diffusion_autoenc/datasets/MRNet-v1.0"
-out_dir = "/home/yv312705/Code/diffusion_autoenc/datasets/MRNet_png_sagittal"
+out_dir = "/home/yv312705/Code/diffusion_autoenc/datasets/MRNet_png_axial"
 save_slices_as_png(data_dir, out_dir)

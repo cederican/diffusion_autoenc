@@ -3,7 +3,7 @@ from io import BytesIO
 from pathlib import Path
 
 import lmdb
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 from torch.utils.data import Dataset
 from torchvision import transforms
 from torchvision.datasets import CIFAR10, LSUNClass
@@ -113,7 +113,11 @@ class BaseLMDB(Dataset):
             img_bytes = txn.get(key)
 
         buffer = BytesIO(img_bytes)
-        img = Image.open(buffer)
+        try:
+            img = Image.open(buffer)
+        except UnidentifiedImageError:
+            print(f"Error: Could not open image file {buffer}. Skipping file.")
+
         return img
 
 
@@ -417,7 +421,7 @@ class MriAttrDataset(Dataset):
     id_to_cls = [
 
         # attribute zum klassifizieren
-        't1_weighted', 't2_weighted', 'pd_weighted'
+        'pdw_fatsupp', 't2_weighted', 't1_weighted'
     ]
     cls_to_id = {v: k for k, v in enumerate(id_to_cls)}
 

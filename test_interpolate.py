@@ -32,7 +32,7 @@ ax[1].imshow(xT[0].permute(1, 2, 0).cpu())
 
 # Interpolation
 
-alpha = torch.tensor(np.linspace(0, 1, 10, dtype=np.float32)).to(cond.device)
+alpha = torch.tensor(np.linspace(0, 1, 40, dtype=np.float32)).to(cond.device)
 intp = cond[0][None] * (1 - alpha[:, None]) + cond[1][None] * alpha[:, None]
 
 def cos(a, b):
@@ -47,23 +47,38 @@ x_shape = xT[0].shape
 intp_x = (torch.sin((1 - alpha[:, None]) * theta) * xT[0].flatten(0, 2)[None] + torch.sin(alpha[:, None] * theta) * xT[1].flatten(0, 2)[None]) / torch.sin(theta)
 intp_x = intp_x.view(-1, *x_shape)
 
-pred = model.render(intp_x, intp, T=20)
+pred = model.render(intp_x, intp, T=1000)
 
-fig, ax = plt.subplots(1, 10, figsize=(5*10, 5))
+fig, ax = plt.subplots(1, 40, figsize=(5*20, 5))
 for i in range(len(alpha)):
     ax[i].imshow(pred[i].permute(1, 2, 0).cpu())
+
+fig.suptitle('Interpolation Testing', fontsize= 20)
+
+# Gif erstellen
+frames = []
+
+for i in range(len(alpha)):
+    numpy_array = (pred[i].permute(1, 2, 0).cpu().numpy() * 255).astype('uint8')
+    image = Image.fromarray(numpy_array)
+    img_resized = image.resize((image.size[0]*2, image.size[1]*2))
+    frames.append(img_resized)
+
+frames[0].save('/home/yv312705/Code/diffusion_autoenc/eval_plots/mri_two/interpolate.gif', format='GIF', save_all=True, append_images=frames[1:], duration=150, loop=0)
+
+
 
 antwort = input("Möchten Sie die Figur speichern? (ja/nein)")
 
 # Wenn die Antwort "Ja" lautet, speichern Sie die Figur ab
 if antwort.lower() == "ja":
 
-    pfad = "/home/yv312705/Code/diffusion_autoenc/eval_plots/"
+    pfad = "/home/yv312705/Code/diffusion_autoenc/eval_plots/mri_two/"
 
     if not os.path.exists(pfad):
         os.makedirs(pfad)
 
-    plt.savefig(pfad + "interpolate50M37K_sagaxi.png")
+    plt.savefig(pfad + "interpolate4M14K_T1000_20.png")
     print("Figur wurde gespeichert!")
 else:
     print("Figur wurde nicht gespeichert.")

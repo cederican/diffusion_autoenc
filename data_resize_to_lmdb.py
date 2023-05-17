@@ -37,7 +37,7 @@ def resize_multiple(img,
 def resize_worker(img_file, sizes, resample):
     i, (file, idx) = img_file
     img = Image.open(file)
-    #img = img.convert("L")
+    #img = img.convert("RGB")
     out = resize_multiple(img, sizes=sizes, resample=resample)
 
     return i, idx, out
@@ -99,7 +99,7 @@ if __name__ == "__main__":
     """
     num_workers = 16
     # original MRNet_png data path
-    in_path = 'datasets/MRNet_png'
+    in_path = 'datasets/test_twow_ax'
     # target output path
     out_path = 'datasets/MRNet.lmdb'
 

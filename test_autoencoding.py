@@ -24,7 +24,7 @@ cond = model.encode(batch.to(device))
 xT = model.encode_stochastic(batch.to(device), cond, T=250)
 
 # Decoder
-pred = model.render(xT, cond, T=25)
+pred = model.render(xT, cond, T=10)
 
 # ssim
 pred = pred.to(device)
@@ -70,12 +70,12 @@ antwort = input("Möchten Sie die Figur speichern? (ja/nein)")
 # Wenn die Antwort "Ja" lautet, speichern Sie die Figur ab
 if antwort.lower() == "ja":
 
-    pfad = "/home/yv312705/Code/diffusion_autoenc/eval_plots/"
+    pfad = "/home/yv312705/Code/diffusion_autoenc/eval_plots/mri_three/"
 
     if not os.path.exists(pfad):
         os.makedirs(pfad)
 
-    plt.savefig(pfad + "autoencoder4M37K_test.png")
+    plt.savefig(pfad + "autoencoder4M14K_T10.png")
     print("Figur wurde gespeichert!")
 else:
     print("Figur wurde nicht gespeichert.")

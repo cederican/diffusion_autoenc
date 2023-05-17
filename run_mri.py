@@ -12,10 +12,10 @@ if __name__ == '__main__':
     train the autoencoder model
     requires 4x currently just 2x V100s
     '''
-    #gpus = [0, 1]
-    #conf = mri_autoenc()
-    #train(conf, gpus=gpus)
-    #print("finished")
+    gpus = [0, 1]
+    conf = mri_autoenc()
+    train(conf, gpus=gpus)
+    print("finished")
 
     
     '''
@@ -40,9 +40,9 @@ if __name__ == '__main__':
     unconditional sampling score
     NOTE: a lot of gpus can speed up this process
     '''
-    gpus = [0]  
-    conf = mri_autoenc_latent()     
-    conf.eval_programs = ['fid(10,10)']
-    train(conf, gpus=gpus, mode='eval')
+    #gpus = [0]  
+    #conf = mri_autoenc_latent()     
+    #conf.eval_programs = ['fid(10,10)']
+    #train(conf, gpus=gpus, mode='eval')
 
     

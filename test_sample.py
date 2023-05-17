@@ -29,12 +29,12 @@ antwort = input("Möchten Sie die Figur speichern? (ja/nein)")
 # Wenn die Antwort "Ja" lautet, speichern Sie die Figur ab
 if antwort.lower() == "ja":
 
-    pfad = "/home/yv312705/Code/diffusion_autoenc/eval_plots/"
+    pfad = "/home/yv312705/Code/diffusion_autoenc/eval_plots/mri_two/"
 
     if not os.path.exists(pfad):
         os.makedirs(pfad)
 
-    plt.savefig(pfad + "dpm_sampleT1000.png")
+    plt.savefig(pfad + "dpm_sample_T1000.png")
     print("Figur wurde gespeichert!")
 else:
     print("Figur wurde nicht gespeichert.")

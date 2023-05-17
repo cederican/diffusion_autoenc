@@ -71,14 +71,14 @@ def mri_autoenc():
     conf.net_ch = 128
     conf.net_ch_mult = (1, 1, 2, 3, 4)                     #edit for 128 or 256
     conf.net_enc_channel_mult = (1, 1, 2, 3, 4, 4)         #edit for 128 or 256
-    conf.eval_ema_every_samples = 200_000                      # edit for dataset
-    conf.eval_every_samples = 200_000
-    conf.eval_num_images = 200                              # how many images for FID Score
-    conf.total_samples = 4_000_000                             # edit for dataset
+    conf.eval_ema_every_samples = 1_000_000                      # edit for dataset
+    conf.eval_every_samples = 1_000_000
+    conf.eval_num_images = 1000                              # how many images for FID Score
+    conf.total_samples = 10_000_000                             # edit for dataset
     conf.batch_size = 16
     conf.scale_up_gpus(2)
     conf.make_model_conf()
-    conf.name = 'mri_autoenc'
+    conf.name = 'mri_autoenc_four'
     return conf
 
 '''
@@ -100,7 +100,7 @@ def mri_ddpm():
     conf = ddpm()
     conf.data_name = 'mrilmdb'
     conf.warmup = 0
-    conf.total_samples = 6_000                   # edit for dataset
+    conf.total_samples = 4_000_000                   # edit for dataset
     conf.img_size = 128                         #edit for minor
     conf.net_ch = 128
     # channels:
@@ -108,10 +108,13 @@ def mri_ddpm():
     # sizes:
     # 128 => 128 => 64 => 32 => 16 => 8
     conf.net_ch_mult = (1, 1, 2, 3, 4)  
-    conf.eval_every_samples = 500                # edit for dataset
-    conf.eval_ema_every_samples = 500            # edit for dataset
+    conf.eval_every_samples = 200_000                # edit for dataset
+    conf.eval_ema_every_samples = 200_000            # edit for dataset
+    conf.eval_num_images = 200 
+    conf.batch_size = 16
     conf.scale_up_gpus(2)
     conf.make_model_conf()
+    conf.name = 'mri_ddpm'
     return conf
 
 '''

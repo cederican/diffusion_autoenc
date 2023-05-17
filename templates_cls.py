@@ -15,13 +15,13 @@ def mri_autoenc_cls():
     conf.latent_infer_path = f'checkpoints/{mri_autoenc().name}/latent.pkl'
     conf.batch_size = 16            #edit for dataset
     conf.lr = 1e-3
-    conf.total_samples = 300_000      #edit for dataset
+    conf.total_samples = 300_000     #edit for dataset
     # use the pretraining trick instead of contiuning trick
     conf.pretrain = PretrainConfig(
         '130M',
         f'checkpoints/{mri_autoenc().name}/last.ckpt',
     )
-    conf.name = 'mri_autoenc_cls'
+    conf.name = 'mri_autoenc_cls_four'
     return conf
 
 
