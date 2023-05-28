@@ -1,6 +1,7 @@
 import os
 from io import BytesIO
 from pathlib import Path
+import numpy as np
 
 import lmdb
 from PIL import Image, UnidentifiedImageError
@@ -11,6 +12,7 @@ import torch
 import pandas as pd
 
 import torchvision.transforms.functional as Ftrans
+import random
 
 
 class ImageDataset(Dataset):
@@ -147,6 +149,7 @@ def make_transform(
 ######################################################################################################
 dataset class for MRI data
 '''
+
 class MRIlmdb(Dataset):
     def __init__(self,
                  path = os.path.expanduser('datasets/MRNet.lmdb'),
@@ -166,11 +169,11 @@ class MRIlmdb(Dataset):
         elif split == 'train':
             # specify the split                     #edit for dataset
             # last 900
-            self.length = self.length - 500
-            self.offset = 500
+            self.length = self.length - 1000
+            self.offset = 1000
         elif split == 'test':
             # first 100
-            self.length = 500
+            self.length = 1000
             self.offset = 0
         else:
             raise NotImplementedError()
@@ -178,10 +181,17 @@ class MRIlmdb(Dataset):
         transform = [
             transforms.Resize(image_size),
         ]
-        if do_augment:
-            transform.append(transforms.RandomHorizontalFlip())
         if as_tensor:
             transform.append(transforms.ToTensor())
+
+        if do_augment:
+            #edit for augmentation
+            transform.append(transforms.RandomRotation(360))
+            transform.append(transforms.RandomHorizontalFlip(p=0.5))
+            transform.append(transforms.RandomVerticalFlip(p=0.5))     
+            transform.append(transforms.RandomAffine(0, translate=(0.2, 0.2)))
+            transform.append(transforms.RandomApply([AddGaussianNoise(0, random.uniform(0, 0.05))], p=0.5))
+
         if do_normalize:
             transform.append(
                 transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)))
@@ -197,12 +207,21 @@ class MRIlmdb(Dataset):
         if self.transform is not None:
             img = self.transform(img)
         return {'img': img, 'index': index}
+    
 
+class AddGaussianNoise(object):
+    def __init__(self, mean=0., std=1.):
+        self.std = std
+        self.mean = mean
+        
+    def __call__(self, tensor):
+        return tensor + torch.randn(tensor.size()) * self.std + self.mean
+    
+    def __repr__(self):
+        return self.__class__.__name__ + '(mean={0}, std={1})'.format(self.mean, self.std)
 '''
 #########################################################################################################################
 '''
-
-
 
 
 class FFHQlmdb(Dataset):
@@ -421,7 +440,7 @@ class MriAttrDataset(Dataset):
     id_to_cls = [
 
         # attribute zum klassifizieren
-        'pdw_fatsupp', 't2_weighted', 't1_weighted'
+        'cor_pd', 'cor_pd_fs'
     ]
     cls_to_id = {v: k for k, v in enumerate(id_to_cls)}
 
@@ -431,7 +450,7 @@ class MriAttrDataset(Dataset):
              attr_path=os.path.expanduser(
                  'datasets/list_attr_mri.txt'),
              original_resolution=128,
-             do_augment: bool = False,
+             do_augment: bool = True,          # augmentation
              do_transform: bool = True,
              do_normalize: bool = True):
         
@@ -443,10 +462,17 @@ class MriAttrDataset(Dataset):
             transforms.Resize(image_size),
             transforms.CenterCrop(image_size),
         ]
-        if do_augment:
-            transform.append(transforms.RandomHorizontalFlip())
         if do_transform:
             transform.append(transforms.ToTensor())
+
+        if do_augment:
+            #edit for augmentation
+            transform.append(transforms.RandomRotation(360))
+            transform.append(transforms.RandomHorizontalFlip(p=0.5))
+            transform.append(transforms.RandomVerticalFlip(p=0.5))     
+            transform.append(transforms.RandomAffine(0, translate=(0.2, 0.2)))
+            transform.append(transforms.RandomApply([AddGaussianNoise(0, random.uniform(0, 0.05))], p=0.5))
+            
         if do_normalize:
             transform.append(
                 transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)))
@@ -483,6 +509,17 @@ class MriAttrDataset(Dataset):
         if self.transform is not None:
             img = self.transform(img)
         return {'img': img, 'index': index, 'labels': torch.tensor(labels)}
+    
+    class AddGaussianNoise(object):
+        def __init__(self, mean=0., std=1.):
+            self.std = std
+            self.mean = mean
+
+        def __call__(self, tensor):
+            return tensor + torch.randn(tensor.size()) * self.std + self.mean
+
+        def __repr__(self):
+            return self.__class__.__name__ + '(mean={0}, std={1})'.format(self.mean, self.std)
 
 '''
 #########################################################################################################

@@ -1,6 +1,8 @@
 from templates import *
 import numpy as np
 import matplotlib.pyplot as plt
+from templates_cls import *
+from experiment_classifier import ClsModel
 
 
 device = 'cuda:0'
@@ -11,6 +13,15 @@ state = torch.load(f'checkpoints/{conf.name}/last.ckpt', map_location='cpu')
 model.load_state_dict(state['state_dict'], strict=False)
 model.ema_model.eval()
 model.ema_model.to(device)
+
+# Classifier Laden
+cls_conf = mri_autoenc_cls()
+cls_model = ClsModel(cls_conf)
+state = torch.load(f'checkpoints/{cls_conf.name}/last.ckpt',
+                    map_location='cpu')
+print('latent step:', state['global_step'])
+cls_model.load_state_dict(state['state_dict'], strict=False)
+cls_model.to(device)
 
 data = ImageDataset('/home/yv312705/Code/diffusion_autoenc/datasets/test_interpolate', image_size=conf.img_size, exts=['jpg', 'JPG', 'png'], do_augment=False)
 batch = torch.stack([
@@ -34,6 +45,11 @@ ax[1].imshow(xT[0].permute(1, 2, 0).cpu())
 
 alpha = torch.tensor(np.linspace(0, 1, 40, dtype=np.float32)).to(cond.device)
 intp = cond[0][None] * (1 - alpha[:, None]) + cond[1][None] * alpha[:, None]
+for i in range(len(intp)):
+    test_cond = cls_model.normalize(intp[i])
+    prediction= cls_model.classifier.forward(test_cond)
+    print('pred:', prediction)
+    test_cond = cls_model.denormalize(test_cond)
 
 def cos(a, b):
     a = a.view(-1)
@@ -51,6 +67,7 @@ pred = model.render(intp_x, intp, T=1000)
 
 fig, ax = plt.subplots(1, 40, figsize=(5*20, 5))
 for i in range(len(alpha)):
+
     ax[i].imshow(pred[i].permute(1, 2, 0).cpu())
 
 fig.suptitle('Interpolation Testing', fontsize= 20)
@@ -64,7 +81,7 @@ for i in range(len(alpha)):
     img_resized = image.resize((image.size[0]*2, image.size[1]*2))
     frames.append(img_resized)
 
-frames[0].save('/home/yv312705/Code/diffusion_autoenc/eval_plots/mri_two/interpolate.gif', format='GIF', save_all=True, append_images=frames[1:], duration=150, loop=0)
+frames[0].save('/home/yv312705/Code/diffusion_autoenc/eval_plots/mri_six/interpolate.gif', format='GIF', save_all=True, append_images=frames[1:], duration=150, loop=0)
 
 
 
@@ -73,12 +90,12 @@ antwort = input("Möchten Sie die Figur speichern? (ja/nein)")
 # Wenn die Antwort "Ja" lautet, speichern Sie die Figur ab
 if antwort.lower() == "ja":
 
-    pfad = "/home/yv312705/Code/diffusion_autoenc/eval_plots/mri_two/"
+    pfad = "/home/yv312705/Code/diffusion_autoenc/eval_plots/mri_six/"
 
     if not os.path.exists(pfad):
         os.makedirs(pfad)
 
-    plt.savefig(pfad + "interpolate4M14K_T1000_20.png")
+    plt.savefig(pfad + "interpolate12M9K_T1000.png")
     print("Figur wurde gespeichert!")
 else:
     print("Figur wurde nicht gespeichert.")

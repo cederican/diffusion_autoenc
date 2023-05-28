@@ -99,7 +99,7 @@ if __name__ == "__main__":
     """
     num_workers = 16
     # original MRNet_png data path
-    in_path = 'datasets/test_twow_ax'
+    in_path = 'datasets/merged_cor'
     # target output path
     out_path = 'datasets/MRNet.lmdb'
 

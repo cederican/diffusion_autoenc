@@ -95,9 +95,9 @@ def mri_autoenc_latent():
     conf.latent_beta_scheduler = 'const0.008'
     conf.eval_ema_every_samples = 20_000_000                # edit for dataset
     conf.eval_every_samples = 20_000_000                    # edit for dataset
-    conf.sample_every_samples = 10_000_000                  # edit for dataset
+    conf.sample_every_samples = 20_000_000                  # edit for dataset
     conf.eval_num_images = 1000 
-    conf.name = 'mri_autoenc_latent_four'
+    conf.name = 'mri_autoenc_latent_six'
     return conf
 
 

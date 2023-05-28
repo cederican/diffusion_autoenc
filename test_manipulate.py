@@ -27,13 +27,13 @@ print('latent step:', state['global_step'])
 cls_model.load_state_dict(state['state_dict'], strict=False)
 cls_model.to(device)
 
-'''
-# Classifier mit ROC Plot testen #########################################
-test_dir = ImageDataset('/home/yv312705/Code/diffusion_autoenc/datasets/test_classifier', image_size=conf.img_size, exts=['jpg', 'JPG', 'png'], do_augment=False)
-test_size = test_dir.__len__()
-test_data_dir = '/home/yv312705/Code/diffusion_autoenc/datasets/test_classifier/'
 
-subdirs = [subdir for subdir in os.listdir(test_data_dir) if os.path.isdir(os.path.join(test_data_dir, subdir))]
+# Classifier mit ROC Plot testen #########################################
+test_dir = ImageDataset('/home/yv312705/Code/diffusion_autoenc/FastMri/test_classifier', image_size=conf.img_size, exts=['jpg', 'JPG', 'png'], do_augment=False)
+test_size = test_dir.__len__()
+test_data_dir = '/home/yv312705/Code/diffusion_autoenc/FastMri/test_classifier/'
+
+subdirs = [subdir for subdir in sorted(os.listdir(test_data_dir)) if os.path.isdir(os.path.join(test_data_dir, subdir))]
 label_map = {subdir: i for i, subdir in enumerate(subdirs)}
 
 labels = []
@@ -79,7 +79,7 @@ antwort = input("Möchten Sie die Figur des ROC Plots speichern? (ja/nein)")
 # Wenn die Antwort "Ja" lautet, speichern Sie die Figur ab
 if antwort.lower() == "ja":
 
-    pfad = "/home/yv312705/Code/diffusion_autoenc/eval_plots/mri_three/"
+    pfad = "/home/yv312705/Code/diffusion_autoenc/eval_plots/mri_six/"
 
     if not os.path.exists(pfad):
         os.makedirs(pfad)
@@ -89,7 +89,8 @@ if antwort.lower() == "ja":
 else:
     print("Figur wurde nicht gespeichert.")
 ######################################################################
-'''
+
+    
 # Bilder Laden
 data = ImageDataset('/home/yv312705/Code/diffusion_autoenc/datasets/test_autoenc', image_size=conf.img_size, exts=['jpg', 'JPG', 'png'], do_augment=False)
 batch = data[0]['img'][None]
@@ -113,7 +114,7 @@ ax[1].imshow(xT[0].permute(1, 2, 0).cpu())
 print(MriAttrDataset.id_to_cls)
 
 # Eingabe des zu manipulierenden Attributs
-cls_id = MriAttrDataset.cls_to_id['t2_weighted']
+cls_id = MriAttrDataset.cls_to_id['cor_pd_fs']
 
 images = []
 
@@ -122,6 +123,10 @@ stepsize = 0.015
 for j in range(20):
     cond_class = cls_model.normalize(cond)
     cond_class = cond_class + stepsize * math.sqrt(512) * F.normalize(cls_model.classifier.weight[cls_id][None, :], dim=1)
+
+    prediction = cls_model.classifier.forward(cond_class)
+    print('pred:', prediction)
+
     cond_class = cls_model.denormalize(cond_class)
     img = model.render(xT, cond_class, T=100)
     cond_class = 0
@@ -153,7 +158,7 @@ for i in range(20):
     img_resized = image.resize((image.size[0]*2, image.size[1]*2))
     frames.append(img_resized)
 
-frames[0].save('/home/yv312705/Code/diffusion_autoenc/eval_plots/mri_three/pd_to_t2.gif', format='GIF', save_all=True, append_images=frames[1:], duration=150, loop=0)
+frames[0].save('/home/yv312705/Code/diffusion_autoenc/eval_plots/mri_six/pd2.gif', format='GIF', save_all=True, append_images=frames[1:], duration=150, loop=0)
 
 
 
@@ -162,12 +167,12 @@ antwort = input("Möchten Sie die Figur der Manipulation speichern? (ja/nein)")
 # Wenn die Antwort "Ja" lautet, speichern Sie die Figur ab
 if antwort.lower() == "ja":
 
-    pfad = "/home/yv312705/Code/diffusion_autoenc/eval_plots/mri_three/"
+    pfad = "/home/yv312705/Code/diffusion_autoenc/eval_plots/mri_six/"
 
     if not os.path.exists(pfad):
         os.makedirs(pfad)
 
-    plt.savefig(pfad + "classifier4M14_pd_to_t2_T100_.png")
+    plt.savefig(pfad + "classifier12M9K_pd_T1002.png")
     print("Figur wurde gespeichert!")
 else:
     print("Figur wurde nicht gespeichert.")

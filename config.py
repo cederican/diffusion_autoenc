@@ -150,8 +150,8 @@ class TrainConfig(BaseConfig):
     parallel: bool = False
     postfix: str = ''
     sample_size: int = 64
-    sample_every_samples: int = 250_000
-    save_every_samples: int = 250_000
+    sample_every_samples: int = 500_000
+    save_every_samples: int = 500_000
     style_ch: int = 512
     T_eval: int = 1_000
     T_sampler: str = 'uniform'
