@@ -37,7 +37,7 @@ def resize_multiple(img,
 def resize_worker(img_file, sizes, resample):
     i, (file, idx) = img_file
     img = Image.open(file)
-    #img = img.convert("RGB")
+    img = img.convert("RGB")
     out = resize_multiple(img, sizes=sizes, resample=resample)
 
     return i, idx, out
@@ -99,9 +99,9 @@ if __name__ == "__main__":
     """
     num_workers = 16
     # original MRNet_png data path
-    in_path = 'datasets/merged_cor'
+    in_path = 'datasets/FastMRI_cor2.png'
     # target output path
-    out_path = 'datasets/MRNet.lmdb'
+    out_path = 'datasets/FastMRI_cor2.lmdb'
 
     if not os.path.exists(out_path):
         os.makedirs(out_path)

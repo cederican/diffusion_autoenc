@@ -732,6 +732,9 @@ class GaussianDiffusionBeatGans:
         Same usage as p_sample_loop().
         """
         final = None
+
+        #sampled_images = []
+
         for sample in self.ddim_sample_loop_progressive(
                 model,
                 shape,
@@ -745,7 +748,10 @@ class GaussianDiffusionBeatGans:
                 eta=eta,
         ):
             final = sample
+            #sampled_images.append(sample)
+
         return final["sample"]
+    #sampled_images 
 
     def ddim_sample_loop_progressive(
         self,

@@ -1,3 +1,4 @@
+from pytorch_lightning.utilities.types import EVAL_DATALOADERS
 from config import *
 from dataset import *
 import pandas as pd
@@ -10,6 +11,8 @@ import pytorch_lightning as pl
 from pytorch_lightning import loggers as pl_loggers
 from pytorch_lightning.callbacks import *
 import torch
+from torch.utils.data.dataset import ConcatDataset, TensorDataset
+
 
 
 class ZipLoader:
@@ -68,6 +71,8 @@ class ClsModel(pl.LightningModule):
         elif conf.manipulate_mode.is_single_class():
             num_cls = 1
         elif conf.manipulate_mode.is_mri():
+            num_cls = len(MriAttrDataset.id_to_cls)
+        elif conf.manipulate_mode.is_mri_cls_eval():
             num_cls = len(MriAttrDataset.id_to_cls)
         else:
             raise NotImplementedError()
@@ -164,7 +169,13 @@ class ClsModel(pl.LightningModule):
                                   self.conf.img_size,
                                   data_paths['mri_anno'],
                                   do_augment=True)
-    
+
+        elif self.conf.manipulate_mode == ManipulateMode.mri_cls_eval:
+            return MriAttrDataset(data_paths['mrilmdb_cls_eval'],
+                                  self.conf.img_size,
+                                  data_paths['mri_anno_cls_eval'],
+                                  do_augment=False)
+        
 
         else:
             raise NotImplementedError()
@@ -210,12 +221,36 @@ class ClsModel(pl.LightningModule):
                                           shuffle=True,
                                           drop_last=True)
         return dataloader
+    
+    def test_dataloader(self):
+        conf = self.conf.clone()
+        conf.batch_size = self.batch_size
+        if isinstance(self.train_data, list):
+            dataloader = []
+            for each in self.train_data:
+                dataloader.append(
+                    conf.make_loader(each, shuffle=True, drop_last=True))
+            dataloader = ZipLoader(dataloader)
+        else:
+            dataloader = conf.make_loader(self.train_data,
+                                          shuffle=False,
+                                          drop_last=True)
+        return dataloader
+
 
     @property
     def batch_size(self):
         ws = get_world_size()
         assert self.conf.batch_size % ws == 0
         return self.conf.batch_size // ws
+    
+    ################################# integrate the edge loss
+    def edge_loss(self, cond, pred):
+
+        cond_gradients = torch.autograd.grad(outputs=pred_softmax[:,1], inputs=cond, grad_outputs=torch.ones_like(pred_softmax[:,1]), create_graph=True, retain_graph=True, only_inputs=True)[0]
+        edge_loss = torch.mean(torch.abs(cond_gradients))
+        return edge_loss
+    
 
     def training_step(self, batch, batch_idx):
         self.ema_model: BeatGANsAutoencModel
@@ -234,6 +269,7 @@ class ClsModel(pl.LightningModule):
                 # (n, c)
                 cond = self.ema_model.encoder(imgs)
 
+            cond.requires_grad_(True) 
             if self.conf.manipulate_znormalize:
                 cond = self.normalize(cond)
 
@@ -268,8 +304,26 @@ class ClsModel(pl.LightningModule):
 
         if self.conf.manipulate_loss == ManipulateLossType.bce:
             loss = F.binary_cross_entropy_with_logits(pred, gt)
+
+            #cond_gradients = torch.autograd.grad(outputs=pred, inputs=cond, grad_outputs=torch.ones_like(pred), create_graph=True, retain_graph=True, only_inputs=True)[0]
+            #edge_loss = torch.mean(torch.abs(cond_gradients))
+
+            #total_loss = loss + edge_loss* 10
+
+            #diff = torch.abs(cond[:, 1:] - cond[:, :-1])
+
+            #edge_loss = torch.mean(diff)
+
+            #total_loss = loss + edge_loss
+
             if pred_ema is not None:
                 loss_ema = F.binary_cross_entropy_with_logits(pred_ema, gt)
+
+                #cond_gradients_ema = torch.autograd.grad(outputs=pred_ema, inputs=cond, grad_outputs=torch.ones_like(pred_ema), create_graph=True, retain_graph=True, only_inputs=True)[0]
+                #edge_loss_ema = torch.mean(torch.abs(cond_gradients_ema))
+
+                #total_loss_ema = loss_ema + edge_loss_ema
+
         elif self.conf.manipulate_loss == ManipulateLossType.mse:
             loss = F.mse_loss(pred, gt)
             if pred_ema is not None:
@@ -277,7 +331,11 @@ class ClsModel(pl.LightningModule):
         else:
             raise NotImplementedError()
 
+        #self.scheduler.step()
+        #print(self.scheduler.get_lr())
+
         self.log('loss', loss)
+        #self.log('edge_loss', edge_loss)
         self.log('loss_ema', loss_ema)
         return loss
 
@@ -289,7 +347,87 @@ class ClsModel(pl.LightningModule):
         optim = torch.optim.Adam(self.classifier.parameters(),
                                  lr=self.conf.lr,
                                  weight_decay=self.conf.weight_decay)
-        return optim
+        
+        # scheduler implementation
+        #scheduler = torch.optim.lr_scheduler.ExponentialLR(optim,
+                            #gamma=self.conf.gamma)
+        #self.scheduler = scheduler
+        return [optim] #[scheduler]
+    
+    def test_step(self, batch, batch_idx):
+        
+        self.ema_model: BeatGANsAutoencModel
+        if isinstance(batch, tuple):
+            a, b = batch
+            imgs = torch.cat([a['img'], b['img']])
+            labels = torch.cat([a['labels'], b['labels']])
+        else:
+            imgs = batch['img']
+            labels = batch['labels']
+
+        if self.conf.train_mode == TrainMode.manipulate:
+            self.ema_model.eval()
+            with torch.no_grad():
+                cond = self.ema_model.encoder(imgs)
+
+            if self.conf.manipulate_znormalize:
+                cond = self.normalize(cond)
+
+            pred = self.classifier.forward(cond)
+
+            _ , predict = torch.max(pred, dim=1)
+            #predict = predict.item()
+            print('Predict:', predict.tolist())
+            label_index = [torch.nonzero(row > 0) for row in labels]
+            print('Truth:', label_index)
+
+            pred_ema = self.ema_classifier.forward(cond)
+        elif self.conf.train_mode == TrainMode.manipulate_img:
+            pred = self.classifier.forward(imgs)
+            pred_ema = None
+        elif self.conf.train_mode == TrainMode.manipulate_imgt:
+            t, weight = self.T_sampler.sample(len(imgs), imgs.device)
+            imgs_t = self.sampler.q_sample(imgs, t)
+            pred = self.classifier.forward(imgs_t, t=t)
+            pred_ema = None
+            print('pred:', pred.shape)
+        else:
+            raise NotImplementedError()
+
+        if self.conf.manipulate_mode.is_celeba_attr():
+            gt = torch.where(labels > 0,
+                             torch.ones_like(labels).float(),
+                             torch.zeros_like(labels).float())
+        elif self.conf.manipulate_mode.is_mri():
+            gt = torch.where(labels > 0,
+                             torch.ones_like(labels).float(),
+                             torch.zeros_like(labels).float())
+        elif self.conf.manipulate_mode.is_mri_cls_eval():
+            gt = torch.where(labels > 0,
+                             torch.ones_like(labels).float(),
+                             torch.zeros_like(labels).float())
+        elif self.conf.manipulate_mode == ManipulateMode.relighting:
+            gt = labels
+        else:
+            raise NotImplementedError()
+
+        if self.conf.manipulate_loss == ManipulateLossType.bce:
+            loss = F.binary_cross_entropy_with_logits(pred, gt)
+            print('Loss:', loss.item())
+            if pred_ema is not None:
+                loss_ema = F.binary_cross_entropy_with_logits(pred_ema, gt)
+                print('Loss EMA:', loss_ema.item())
+        elif self.conf.manipulate_loss == ManipulateLossType.mse:
+            loss = F.mse_loss(pred, gt)
+            if pred_ema is not None:
+                loss_ema = F.mse_loss(pred_ema, gt)
+        else:
+            raise NotImplementedError()
+        
+
+        self.log('val_loss', loss)
+        self.log('val_loss_ema', loss_ema)
+        return loss
 
 
 def ema(source, target, decay):
@@ -300,7 +438,7 @@ def ema(source, target, decay):
                                     source_dict[key].data * (1 - decay))
 
 
-def train_cls(conf: TrainConfig, gpus):
+def train_cls(conf: TrainConfig, gpus, mode: str = 'train'):
     print('conf:', conf.name)
     model = ClsModel(conf)
 
@@ -351,5 +489,36 @@ def train_cls(conf: TrainConfig, gpus):
         logger=tb_logger,
         accumulate_grad_batches=conf.accum_batches,
         plugins=plugins,
+        track_grad_norm=False
     )
-    trainer.fit(model)
+
+    if mode == 'train':
+        trainer.fit(model)
+    elif mode == 'eval':
+        #dummy = DataLoader(TensorDataset(torch.tensor([0.] * conf.batch_size)),
+                          #batch_size=conf.batch_size)
+        setup = model.setup()
+        testdataloader = model.test_dataloader()
+        eval_path = conf.eval_path or checkpoint_path
+        print('loading from:', eval_path)
+        state = torch.load(eval_path, map_location='cpu')
+        print('step:', state['global_step'])
+        model.load_state_dict(state['state_dict'])
+
+        out = trainer.test(model, dataloaders=testdataloader)
+        out = out[0]
+        print(out)
+
+        #loss_values = []
+        #for batch in testdataloader:
+            #output = model.test_step(batch, batch_idx=0)  # `batch_idx` kann beliebig gewählt werden
+            #loss_values.append(output.item())
+
+
+        if get_rank() == 0:
+            # save to tensorboard
+            for k, v in out.items():
+                tb_logger.experiment.add_scalar(
+                    k, v, state['global_step'] * conf.batch_size_effective)
+    else:
+        raise NotImplementedError()         

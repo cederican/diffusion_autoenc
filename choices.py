@@ -55,6 +55,8 @@ class ManipulateMode(Enum):
     # train on the mri attr dataset
     mri = 'mri'
 
+    mri_cls_eval  = 'mri_cls_eval'
+
     # train on whole celeba attr dataset
     celebahq_all = 'celebahq_all'
     # celeba with D2C's crop
@@ -65,6 +67,11 @@ class ManipulateMode(Enum):
     def is_mri(self):
         return self in [
             ManipulateMode.mri,
+        ]
+    
+    def is_mri_cls_eval(self):
+        return self in [
+            ManipulateMode.mri_cls_eval,
         ]
     
     def is_celeba_attr(self):

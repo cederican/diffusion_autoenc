@@ -9,10 +9,10 @@ if __name__ == '__main__':
     train the autoencoder model
     requires 4x currently just 2x V100s
     '''
-    #gpus = [0, 1]
-    #conf = mri_autoenc()
-    #train(conf, gpus=gpus)
-    #print("finished")
+    gpus = [0, 1]
+    conf = mri_autoenc()
+    train(conf, gpus=gpus)
+    print("finished")
 
     
     '''
@@ -28,10 +28,10 @@ if __name__ == '__main__':
     train the latent DPM
     Note: only need of a single gpu
     '''
-    gpus = [0]
-    conf = mri_autoenc_latent()
-    train(conf, gpus=gpus)
-    print("finished")
+    #gpus = [0]
+    #conf = mri_autoenc_latent()
+    #train(conf, gpus=gpus)
+    #print("finished")
 
     '''
     unconditional sampling score

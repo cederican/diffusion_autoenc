@@ -138,8 +138,12 @@ def make_transform(
             transforms.Resize(image_size),
             transforms.CenterCrop(image_size),
         ]
-    transform.append(transforms.RandomHorizontalFlip(p=flip_prob))
     transform.append(transforms.ToTensor())
+    transform.append(transforms.RandomRotation((-10,10)))
+    transform.append(transforms.RandomHorizontalFlip(p=0.5))
+    transform.append(transforms.RandomVerticalFlip(p=0.5))     
+    transform.append(transforms.RandomAffine(0, translate=(0.2, 0.2)))
+    transform.append(transforms.RandomApply([AddGaussianNoise(0, random.uniform(0, 0.05))], p=0.5))
     transform.append(transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)))
     transform = transforms.Compose(transform)
     return transform
@@ -152,7 +156,9 @@ dataset class for MRI data
 
 class MRIlmdb(Dataset):
     def __init__(self,
-                 path = os.path.expanduser('datasets/MRNet.lmdb'),
+                 path = os.path.expanduser('datasets/FastMRI_cor2.lmdb'),
+                 #path = os.path.expanduser('datasets/fastMRNetall.lmdb'),
+                 #path = os.path.expanduser('datasets/FastMRI_cor.lmdb'),
                  image_size = 128,              #edit for 128 or 256
                  original_resolution = 128,     #edit for 128 or 256
                  split = None,
@@ -186,7 +192,7 @@ class MRIlmdb(Dataset):
 
         if do_augment:
             #edit for augmentation
-            transform.append(transforms.RandomRotation(360))
+            transform.append(transforms.RandomRotation((-10,10)))
             transform.append(transforms.RandomHorizontalFlip(p=0.5))
             transform.append(transforms.RandomVerticalFlip(p=0.5))     
             transform.append(transforms.RandomAffine(0, translate=(0.2, 0.2)))
@@ -440,17 +446,19 @@ class MriAttrDataset(Dataset):
     id_to_cls = [
 
         # attribute zum klassifizieren
-        'cor_pd', 'cor_pd_fs'
+        'pd', 'pd_fs', 't1', 't2_fs'
     ]
     cls_to_id = {v: k for k, v in enumerate(id_to_cls)}
 
     def __init__(self,
-             path=os.path.expanduser('datasets/MRNet.lmdb'),
+             path = os.path.expanduser('datasets/FastMRI_cor2.lmdb'),
+             #path=os.path.expanduser('datasets/fastMRNetall.lmdb'),
+             #path=os.path.expanduser('datasets/FastMRI_cor.lmdb'),
              image_size=None,
              attr_path=os.path.expanduser(
                  'datasets/list_attr_mri.txt'),
              original_resolution=128,
-             do_augment: bool = True,          # augmentation
+             do_augment: bool = False,          # augmentation
              do_transform: bool = True,
              do_normalize: bool = True):
         
@@ -467,7 +475,7 @@ class MriAttrDataset(Dataset):
 
         if do_augment:
             #edit for augmentation
-            transform.append(transforms.RandomRotation(360))
+            transform.append(transforms.RandomRotation((-10,10)))
             transform.append(transforms.RandomHorizontalFlip(p=0.5))
             transform.append(transforms.RandomVerticalFlip(p=0.5))     
             transform.append(transforms.RandomAffine(0, translate=(0.2, 0.2)))

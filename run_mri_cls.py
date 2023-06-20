@@ -8,4 +8,8 @@ if __name__ == '__main__':
     '''
     gpus = [0]
     conf = mri_autoenc_cls()
-    train_cls(conf, gpus=gpus)
+    train_cls(conf, gpus=gpus, mode='train')
+
+    #gpus = [0]
+    #conf = mri_autoenc_cls_eval()
+    #train_cls(conf, gpus=gpus, mode='eval')

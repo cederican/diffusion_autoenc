@@ -42,10 +42,21 @@ data_paths = {
 
     #link to the MRI lmdb dataset
     'mrilmdb':
-    os.path.expanduser('datasets/MRNet.lmdb'),
+    os.path.expanduser('datasets/FastMRI_cor2.lmdb'),
+    #os.path.expanduser('datasets/fastMRNetall.lmdb'),
+    #os.path.expanduser('datasets/FastMRI_cor.lmdb'),
+
     #link to the labeled MRI .txt file
     'mri_anno':
     os.path.expanduser('datasets/list_attr_mri.txt'),
+
+    #link to the MRI lmdb eval classifier dataset
+    'mrilmdb_cls_eval':
+    os.path.expanduser('datasets/EvalCls.lmdb'),
+    #link to the labeled MRI .txt file
+    'mri_anno_cls_eval':
+    os.path.expanduser('datasets/list_attr_mri_eval_cls.txt'),
+
 }
 
 
@@ -103,6 +114,8 @@ class TrainConfig(BaseConfig):
     grad_clip: float = 1
     img_size: int = 64
     lr: float = 0.0001
+    step_size: float = 3 #number of epochs after which lr will be reduced
+    gamma: float = 0.1 #factor by which the lr is multiplied
     optimizer: OptimizerType = OptimizerType.adam
     weight_decay: float = 0
     model_conf: ModelConfig = None
@@ -151,7 +164,7 @@ class TrainConfig(BaseConfig):
     postfix: str = ''
     sample_size: int = 64
     sample_every_samples: int = 500_000
-    save_every_samples: int = 500_000
+    save_every_samples: int = 1_000_000
     style_ch: int = 512
     T_eval: int = 1_000
     T_sampler: str = 'uniform'

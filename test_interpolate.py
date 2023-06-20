@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from templates_cls import *
 from experiment_classifier import ClsModel
+from PIL import Image
 
 
 device = 'cuda:0'
@@ -63,7 +64,7 @@ x_shape = xT[0].shape
 intp_x = (torch.sin((1 - alpha[:, None]) * theta) * xT[0].flatten(0, 2)[None] + torch.sin(alpha[:, None] * theta) * xT[1].flatten(0, 2)[None]) / torch.sin(theta)
 intp_x = intp_x.view(-1, *x_shape)
 
-pred = model.render(intp_x, intp, T=1000)
+pred = model.render(intp_x, intp, T=100)
 
 fig, ax = plt.subplots(1, 40, figsize=(5*20, 5))
 for i in range(len(alpha)):
@@ -81,8 +82,14 @@ for i in range(len(alpha)):
     img_resized = image.resize((image.size[0]*2, image.size[1]*2))
     frames.append(img_resized)
 
-frames[0].save('/home/yv312705/Code/diffusion_autoenc/eval_plots/mri_six/interpolate.gif', format='GIF', save_all=True, append_images=frames[1:], duration=150, loop=0)
+frames[0].save('/home/yv312705/Code/diffusion_autoenc/eval_plots/mri_seven/interpolate.gif', format='GIF', save_all=True, append_images=frames[1:], duration=150, loop=0)
 
+#schicker plot bilderreihe
+breite, höhe = frames[0].size
+ausgabe = Image.new('L', (breite * len(frames), höhe))
+for index, bild in enumerate(frames):
+    ausgabe.paste(bild, (index * breite, 0))
+ausgabe.save('/home/yv312705/Code/diffusion_autoenc/eval_plots/mri_seven/test.png')
 
 
 antwort = input("Möchten Sie die Figur speichern? (ja/nein)")
@@ -90,12 +97,12 @@ antwort = input("Möchten Sie die Figur speichern? (ja/nein)")
 # Wenn die Antwort "Ja" lautet, speichern Sie die Figur ab
 if antwort.lower() == "ja":
 
-    pfad = "/home/yv312705/Code/diffusion_autoenc/eval_plots/mri_six/"
+    pfad = "/home/yv312705/Code/diffusion_autoenc/eval_plots/mri_seven/"
 
     if not os.path.exists(pfad):
         os.makedirs(pfad)
 
-    plt.savefig(pfad + "interpolate12M9K_T1000.png")
+    plt.savefig(pfad + "interpolate8M20K_T1000.png")
     print("Figur wurde gespeichert!")
 else:
     print("Figur wurde nicht gespeichert.")
