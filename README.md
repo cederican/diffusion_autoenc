@@ -44,7 +44,7 @@ Note: Most experiment requires at least 4x V100s during training the DPM models 
 
 
 
-**FFHQ128**
+**MRI Knee COR**
 ```
 # diffae
 python run_mri.py
@@ -53,4 +53,23 @@ python run_mri.py
 A classifier (for manipulation) can be trained using:
 ```
 python run_mri_cls.py
+```
+
+## Evaluation
+
+```
+# evaluate diffusion autoencoder
+python test_autoencoding.py
+
+# evaluate latent sampling and interpolation
+python test_interpolate.py
+python test_sample.py
+
+# evaluate sequence conversion
+python test_manipulate.py
+
+# cool visualizations
+python test_giftorow.py
+python test_diffaenoise.py
+
 ```
