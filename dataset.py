@@ -139,11 +139,11 @@ def make_transform(
             transforms.CenterCrop(image_size),
         ]
     transform.append(transforms.ToTensor())
-    transform.append(transforms.RandomRotation((-10,10)))
-    transform.append(transforms.RandomHorizontalFlip(p=0.5))
-    transform.append(transforms.RandomVerticalFlip(p=0.5))     
-    transform.append(transforms.RandomAffine(0, translate=(0.2, 0.2)))
-    transform.append(transforms.RandomApply([AddGaussianNoise(0, random.uniform(0, 0.05))], p=0.5))
+    #transform.append(transforms.RandomRotation((-10,10)))
+    #transform.append(transforms.RandomHorizontalFlip(p=0.5))
+    #transform.append(transforms.RandomVerticalFlip(p=0.5))     
+    #transform.append(transforms.RandomAffine(0, translate=(0.2, 0.2)))
+    #transform.append(transforms.RandomApply([AddGaussianNoise(0, random.uniform(0, 0.05))], p=0.5))
     transform.append(transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)))
     transform = transforms.Compose(transform)
     return transform
@@ -446,7 +446,7 @@ class MriAttrDataset(Dataset):
     id_to_cls = [
 
         # attribute zum klassifizieren
-        'pd', 'pd_fs', 't1', 't2_fs'
+        'cor_pd', 'cor_pd_fs', 'cor_t1'
     ]
     cls_to_id = {v: k for k, v in enumerate(id_to_cls)}
 

@@ -22,7 +22,7 @@ def mri_autoenc_cls():
         '130M',
         f'checkpoints/{mri_autoenc().name}/last.ckpt',
     )
-    conf.name = 'mri_autoenc_cls_eight_justcontrast'
+    conf.name = 'mri_autoenc_cls_nine'
     return conf
 
 def mri_autoenc_cls_eval():

@@ -17,8 +17,8 @@ def convert_dicom_to_png(input_folder, output_folder1, output_folder2, output_fo
     index4 = 00000
     index5 = 00000
 
-    start_index = 0
-    end_index = 3000
+    start_index = 3001
+    end_index = 3100
 
     index_stack_start = 13
     index_stack_end = 21
@@ -133,8 +133,8 @@ def convert_dicom_to_png(input_folder, output_folder1, output_folder2, output_fo
 
 # Beispielaufruf der Funktion
 input_folder = '/work/yv312705/NYU_data/knee_mri_clinical_seq'
-output_folder1 = '/home/yv312705/Code/diffusion_autoenc/FastMri/COR_pd'
-output_folder2 = '/home/yv312705/Code/diffusion_autoenc/FastMri/COR_pd_fs'
+output_folder1 = '/home/yv312705/Code/diffusion_autoenc/FastMri/test_classifier/a_cor_pd'
+output_folder2 = '/home/yv312705/Code/diffusion_autoenc/FastMri/test_classifier/b_cor_pd_fs'
 output_folder3 = '/home/yv312705/Code/diffusion_autoenc/FastMri/test_classifier_contr/a_pd'
 output_folder4 = '/home/yv312705/Code/diffusion_autoenc/FastMri/test_classifier_contr/d_t2_fs'
 output_folder5 = '/home/yv312705/Code/diffusion_autoenc/FastMri/test_classifier_contr/d_t2_fs'

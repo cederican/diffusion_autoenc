@@ -48,6 +48,6 @@ def save_slices_as_png(input_dir, output_dir):
             index += 1
 
 data_dir = "/home/yv312705/Code/diffusion_autoenc/datasets/MRNet-v1.0"
-out_dir = "/home/yv312705/Code/diffusion_autoenc/FastMri/test_classifier_contr/c_t1"
+out_dir = "/home/yv312705/Code/diffusion_autoenc/FastMri/test_classifier/c_cor_t1"
 save_slices_as_png(data_dir, out_dir)
 

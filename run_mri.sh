@@ -1,12 +1,11 @@
 #!/usr/bin/zsh
 
-#SBATCH --account=thes1415
-#SBATCH --job-name=diffae_autoenc
-#SBATCH --output=output.log
-#SBATCH --error=errors.log
-#SBATCH --gres=gpu:2
+#SBATCH --job-name=diffae_autoenc5
+#SBATCH --output=output5.log
+#SBATCH --error=errors5.log
+#SBATCH --gres=gpu:1
 #SBATCH --mem-per-gpu=16GB
-#SBATCH --time=4-00:00:00   
+#SBATCH --time=04:00:00   
 
 module load CUDA
 
@@ -23,4 +22,4 @@ echo; export; echo; nvidia-smi; echo
 export NCCL_DEBUG=INFO
 export PYTHONFAULTHANDLER=1
 
-srun python run_mri.py
+srun python test_manipulate.py

@@ -14,7 +14,7 @@ print(model.load_state_dict(state['state_dict'], strict=False))
 model.to(device)
 
 # sample images
-torch.manual_seed(0)
+torch.manual_seed(1)
 imgs = model.sample(8, device=device, T=1000, T_latent=200)
 
 # plot the generated samples
@@ -22,14 +22,14 @@ fig, ax = plt.subplots(2, 4, figsize=(4*5, 2*5))
 ax = ax.flatten()
 for i in range(len(imgs)):
     ax[i].imshow(imgs[i].cpu().permute([1, 2, 0]))
-fig.suptitle('Diffusion Probablistic Model (DPM) Testing', fontsize= 17)
+fig.suptitle('Latent sampling', fontsize= 18, fontweight='bold')
 
 antwort = input("Möchten Sie die Figur speichern? (ja/nein)")
 
 # Wenn die Antwort "Ja" lautet, speichern Sie die Figur ab
 if antwort.lower() == "ja":
 
-    pfad = "/home/yv312705/Code/diffusion_autoenc/eval_plots/mri_two/"
+    pfad = "/home/yv312705/Code/diffusion_autoenc/eval_plots/mri_nine/sampling/"
 
     if not os.path.exists(pfad):
         os.makedirs(pfad)

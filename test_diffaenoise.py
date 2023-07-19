@@ -2,6 +2,7 @@ from templates import *
 import matplotlib.pyplot as plt
 from ssim import *
 from PIL import Image
+import numpy as np
 
 device = 'cuda:1'
 conf = mri_autoenc()
@@ -24,18 +25,61 @@ cond = model.encode(batch.to(device))
 xT = model.encode_stochastic(batch.to(device), cond, T=250)
 
 # Decoder
-pred_list = model.render(xT, cond, T=500)
+pred_list = model.render(xT, cond, T=1000)
 
-x_500 = (pred_list[0]["sample"] + 1) /2
-x_200 = (pred_list[299]["sample"] + 1) /2
-x_100 = (pred_list[399]["sample"] + 1) /2
-x_50 = (pred_list[449]["sample"] + 1) /2
-x_20 =  (pred_list[479]["sample"] + 1) /2
-x_10 =  (pred_list[489]["sample"] + 1) /2
-x_5 =  (pred_list[494]["sample"] + 1) /2
-x_2 =  (pred_list[497]["sample"] + 1) /2
-x_1 =  (pred_list[498]["sample"] + 1) /2
-x_0 =  (pred_list[499]["sample"] + 1) /2
+frames = []
+frames_image = []
+
+x_1000 = (pred_list[0]["sample"] + 1) /2
+frames.append(x_1000)
+x_900 = (pred_list[99]["sample"] + 1) /2
+frames.append(x_900)
+x_800 = (pred_list[199]["sample"] + 1) /2
+frames.append(x_800)
+x_700 = (pred_list[299]["sample"] + 1) /2
+frames.append(x_700)
+x_600 = (pred_list[399]["sample"] + 1) /2
+frames.append(x_600)
+x_500 = (pred_list[499]["sample"] + 1) /2
+frames.append(x_500)
+x_400 = (pred_list[599]["sample"] + 1) /2
+frames.append(x_400)
+x_300 = (pred_list[699]["sample"] + 1) /2
+frames.append(x_300)
+x_200 = (pred_list[799]["sample"] + 1) /2
+frames.append(x_200)
+x_100 = (pred_list[899]["sample"] + 1) /2
+frames.append(x_100)
+x_80 = (pred_list[919]["sample"] + 1) /2
+frames.append(x_80)
+x_60 = (pred_list[939]["sample"] + 1) /2
+frames.append(x_60)
+x_40 = (pred_list[959]["sample"] + 1) /2
+frames.append(x_40)
+x_20 =  (pred_list[979]["sample"] + 1) /2
+frames.append(x_20)
+x_10 =  (pred_list[989]["sample"] + 1) /2
+frames.append(x_10)
+x_5 =  (pred_list[994]["sample"] + 1) /2
+frames.append(x_5)
+x_2 =  (pred_list[997]["sample"] + 1) /2
+frames.append(x_2)
+x_1 =  (pred_list[998]["sample"] + 1) /2
+frames.append(x_1)
+x_0 =  (pred_list[999]["sample"] + 1) /2
+frames.append(x_0)
+
+for i in range(len(frames)):
+    numpy_array = (frames[i][0].permute(1, 2, 0).cpu().numpy() * 255).astype('uint8')
+    image = Image.fromarray(numpy_array)
+    frames_image.append(image)
+
+#-------- schicker plot bilderreihe ---------
+breite, höhe = frames_image[0].size
+ausgabe = Image.new('RGBA', (breite * len(frames_image), höhe))
+for index, bild in enumerate(frames_image):
+    ausgabe.paste(bild, (index * breite, 0))
+ausgabe.save('/home/yv312705/Code/diffusion_autoenc/eval_plots/mri_nine/autoencoder/denoise.png')
 
 fig, ax = plt.subplots(1, 10, figsize=(14, 8))
 
@@ -45,7 +89,7 @@ ax[1].imshow(x_200[0].permute(1, 2, 0).cpu())
 ax[1].set_title('X_200', fontsize= 14)
 ax[2].imshow(x_100[0].permute(1, 2, 0).cpu())
 ax[2].set_title('X_100', fontsize= 14)
-ax[3].imshow(x_50[0].permute(1, 2, 0).cpu())
+ax[3].imshow(x_60[0].permute(1, 2, 0).cpu())
 ax[3].set_title('X_50', fontsize= 14)
 ax[4].imshow(x_20[0].permute(1, 2, 0).cpu())
 ax[4].set_title('X_20', fontsize= 14)
@@ -107,12 +151,12 @@ antwort = input("Möchten Sie die Figur speichern? (ja/nein)")
 # Wenn die Antwort "Ja" lautet, speichern Sie die Figur ab
 if antwort.lower() == "ja":
 
-    pfad = "/home/yv312705/Code/diffusion_autoenc/eval_plots/mri_seven/"
+    pfad = "/home/yv312705/Code/diffusion_autoenc/eval_plots/mri_nine/autoencoder/"
 
     if not os.path.exists(pfad):
         os.makedirs(pfad)
 
-    plt.savefig(pfad + "autoencoder8M20K_T1000_noise.png")
+    plt.savefig(pfad + "autoencoder_denoise.png")
     print("Figur wurde gespeichert!")
 else:
     print("Figur wurde nicht gespeichert.")

@@ -733,7 +733,7 @@ class GaussianDiffusionBeatGans:
         """
         final = None
 
-        #sampled_images = []
+        sampled_images = []
 
         for sample in self.ddim_sample_loop_progressive(
                 model,
@@ -751,7 +751,7 @@ class GaussianDiffusionBeatGans:
             #sampled_images.append(sample)
 
         return final["sample"]
-    #sampled_images 
+        #return sampled_images 
 
     def ddim_sample_loop_progressive(
         self,

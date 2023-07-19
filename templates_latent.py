@@ -90,13 +90,13 @@ def mri_autoenc_latent():
     conf = latent_mlp_2048_norm_10layers(conf)
     conf = latent_256_batch_size(conf)
     conf = adamw_weight_decay(conf)
-    conf.total_samples = 20_000_000                       # edit for dataset
+    conf.total_samples = 100_000_000                       # edit for dataset
     conf.latent_loss_type = LossType.l1
     conf.latent_beta_scheduler = 'const0.008'
-    conf.eval_ema_every_samples = 10_000_000                # edit for dataset
-    conf.eval_every_samples = 10_000_000                    # edit for dataset
+    conf.eval_ema_every_samples = 5_000_000                # edit for dataset
+    conf.eval_every_samples = 5_000_000                    # edit for dataset
     conf.sample_every_samples = 1_000_000                  # edit for dataset
-    conf.eval_num_images = 1000 
+    conf.eval_num_images = 10_000 
     conf.name = 'mri_autoenc_latent_nine'
     return conf
 
