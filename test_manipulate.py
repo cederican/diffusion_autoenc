@@ -13,17 +13,13 @@ import torch
 import torchvision.transforms as transforms
 from ssim import *
 
+# ----------------- cluster spezifisch remote -------------------- 
 torch.set_printoptions(threshold=torch.inf)
-
 print(plt.get_backend())
-
-# Backend auf "agg" ändern
 plt.switch_backend('agg')
-
-# Neues Backend anzeigen
 print(plt.get_backend())
 
-# Diffusion Autoencoder Laden
+# ---------------- Diffusion Autoencoder Laden ----------------
 device = 'cuda:0'
 conf = mri_autoenc()
 model = LitModel(conf)
@@ -32,7 +28,7 @@ model.load_state_dict(state['state_dict'], strict=False)
 model.ema_model.eval()
 model.ema_model.to(device)
 
-# Classifier Laden
+# ------------------ Classifier Laden -------------------------
 cls_conf = mri_autoenc_cls()
 cls_model = ClsModel(cls_conf)
 state = torch.load(f'checkpoints/{cls_conf.name}/last.ckpt',
@@ -42,7 +38,7 @@ cls_model.load_state_dict(state['state_dict'], strict=False)
 cls_model.to(device)
 
 
-# ---------------- Multiclass Classifier -------------------
+# ---------------- Multiclass Classifier Evaluation -------------------
 test_dir = ImageDataset('/home/yv312705/Code/diffusion_autoenc/FastMri/test_classifier', image_size=conf.img_size, exts=['jpg', 'JPG', 'png'], do_augment=False, sort_names=True)
 test_size = test_dir.__len__()
 test_data_dir = '/home/yv312705/Code/diffusion_autoenc/FastMri/test_classifier/'
@@ -164,7 +160,8 @@ else:
 
 
 '''
-# ------------------ Binary Classifier mit ROC Plot testen #########################################
+# ------------------ Binary Classifier mit ROC Plot testen -----------------------
+
 test_dir = ImageDataset('/home/yv312705/Code/diffusion_autoenc/FastMri/test_classifier', image_size=conf.img_size, exts=['jpg', 'JPG', 'png'], do_augment=False)
 test_size = test_dir.__len__()
 test_data_dir = '/home/yv312705/Code/diffusion_autoenc/FastMri/test_classifier/'
@@ -337,35 +334,18 @@ for p in range(30):
             break
         stepsize += 0.01
 
-    '''
-    index = 00000
-    for u in range(len(images)):
-        index_str = "{:05d}".format(index)
-        slice_name = f"{index_str}.png"
-        slice_path = os.path.join('/home/yv312705/Code/diffusion_autoenc/eval_plots/mri_nine/edge_test', slice_name)
-
-        r = images[u]
-        r_dat = (r *255).byte()
-        r_np = np.array(r_dat[0,0].cpu())
-
-        r_img = Image.fromarray(r_np)
-        r_resized = r_img.resize((r_img.size[0]*2, r_img.size[1]*2))
-        r_np = np.array(r_resized)
-
-        cv2.imwrite(slice_path, r_np)
-        index += 1
-    '''
+# ----------------- function to classify the edges ------------------- 
     def edgeclassifier(images, original_edgeimg, step_size):
 
         original_edgetensor = torch.from_numpy(original_edgeimg).unsqueeze(0)
         diff_tensors = []
 
-        # ---------- edge images syn ---------
+        # ---------- edge images generated ---------
         for i in range(num_steps):
             edge_image = cv2.Canny(images[i], threshold1=100, threshold2=150)
             edge_images.append(edge_image)
 
-        # ------- Abs. Diff ----------
+        # ------- Abs. Diff images  ----------
         for j in range(num_steps):
             edge_tensor = torch.from_numpy(edge_images[j]).unsqueeze(0)
             diff_tensor = torch.abs(edge_tensor.permute(1, 2, 0).cpu() - original_edgetensor.permute(1, 2, 0).cpu())

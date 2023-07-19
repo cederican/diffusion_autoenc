@@ -13,17 +13,14 @@ import torch
 import torchvision.transforms as transforms
 from ssim import *
 
+# ---------------- Cluster spezifisch für Remote --------------
+
 torch.set_printoptions(threshold=torch.inf)
-
 print(plt.get_backend())
-
-# Backend auf "agg" ändern
 plt.switch_backend('agg')
-
-# Neues Backend anzeigen
 print(plt.get_backend())
 
-# Diffusion Autoencoder Laden
+# --------------- Diffusion Autoencoder Laden ----------------
 device = 'cuda:0'
 conf = mri_autoenc()
 model = LitModel(conf)
@@ -32,7 +29,7 @@ model.load_state_dict(state['state_dict'], strict=False)
 model.ema_model.eval()
 model.ema_model.to(device)
 
-# Classifier Laden
+# --------------- Classifier Laden ----------------------
 cls_conf = mri_autoenc_cls()
 cls_model = ClsModel(cls_conf)
 state = torch.load(f'checkpoints/{cls_conf.name}/last.ckpt',
@@ -84,6 +81,5 @@ for p in range(2):
     output_path1 = os.path.join('/home/yv312705/Code/diffusion_autoenc/testing', slice_name1)
     cv2.imwrite(output_path, img)
     cv2.imwrite(output_path1, ori)
-
 
     index += 1

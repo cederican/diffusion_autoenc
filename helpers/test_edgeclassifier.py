@@ -13,6 +13,8 @@ import torch
 import torchvision.transforms as transforms
 from ssim import *
 
+# --------------------------- funktion um canny edge algorithmus herumzuprobieren ----------------------
+# ------------------ not important -----------------------
 torch.set_printoptions(threshold=torch.inf)
 
 print(plt.get_backend())

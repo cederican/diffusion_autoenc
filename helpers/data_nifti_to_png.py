@@ -9,7 +9,7 @@ from PIL import Image
 import json
 import random
 
-
+# ----------------------- Skript to extract and crop data from the M&M dataset of axial images -----------------
 
 nifti_files = []
 

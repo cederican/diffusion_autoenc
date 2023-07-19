@@ -1,31 +1,26 @@
 from PIL import Image
 
-
+# ----------------- convert a gif into a panorama plot ------------------
 frames_image = []
 
-# GIF-Datei laden
 gif_path = '/home/yv312705/Code/diffusion_autoenc/eval_plots/mri_nine/cor_t1/cor_pd_fs/classifier_gif_7cor_pd_fs.gif'
 gif_image = Image.open(gif_path)
 
-# Anzahl der Frames im GIF abrufen
 num_frames = gif_image.n_frames
 
 iterator = int(num_frames/8)
 
-# Extrahieren und speichern der einzelnen Bilder
 frame = 0
 while frame < num_frames:
 
     if (frame + iterator) > num_frames:
         frame = num_frames-1
 
-    # Einzelnes Bild im GIF auswählen
     gif_image.seek(frame)
 
     frames_image.append(gif_image.copy())
 
     frame+= iterator
-
 
 
 #-------- schicker plot bilderreihe ---------

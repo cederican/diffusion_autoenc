@@ -3,6 +3,9 @@ import matplotlib.pyplot as plt
 from ssim import *
 from PIL import Image
 
+# -------------------- script to test the autoencoder performance ---------------------
+
+# ------------- load diffae model ------------
 device = 'cuda:1'
 conf = mri_autoenc()
 #print(conf.name)
@@ -12,21 +15,21 @@ model.load_state_dict(state['state_dict'], strict=False)
 model.ema_model.eval()
 model.ema_model.to(device)
 
-
+# --------------- load a testimage -------------------------
 data = ImageDataset('/home/yv312705/Code/diffusion_autoenc/datasets/test_autoenc', image_size=conf.img_size, exts=['jpg', 'JPG', 'png'], do_augment=False)
-batch = data[8]['img'][None]
+batch = data[0]['img'][None]
 
-# original
+# ---------- original ---------------
 ori = (batch + 1) / 2
 
-# Encoder
+# ---------- Encoder --------------
 cond = model.encode(batch.to(device))
 xT = model.encode_stochastic(batch.to(device), cond, T=250)
 
-# Decoder
+# ---------- Decoder ---------------
 pred = model.render(xT, cond, T=100)
 
-# ssim
+# ---------- ssim calculate ------------
 pred = pred.to(device)
 ori = ori.to(device)
 ssim = SSIM()
@@ -34,11 +37,11 @@ score = ssim(ori, pred)
 ssim_score = "SSIM Score:\n " + str(round(score.item(), 3))
 print(ssim_score)
 
-# Differenz der Bilder
+# --------------- Differenz der Bilder -------------
 diff_tensor = torch.abs(ori[0].permute(1, 2, 0).cpu() - pred[0].permute(1, 2, 0).cpu())
 
 
-# plot evaluation
+# ----------- plot evaluation -------------
 fig, ax = plt.subplots(2, 3, figsize=(14, 8))
 
 ax[0, 0].imshow(ori[0].permute(1, 2, 0).cpu())
@@ -59,7 +62,8 @@ ax[1, 0].axis('off')
 ax[1, 1].imshow(pred[0].permute(1, 2, 0).cpu())
 ax[1, 1].set_title('Decoded Image', fontsize= 18)
 ax[1, 1].axis('off')
-# range des diff bildes wichtig, sensitivität so einstellen mit original max value. vmin 0 für Gleichheit
+
+# ----------- range des diff bildes wichtig, sensitivität so einstellen mit original max value. vmin 0 für Gleichheit
 ax[1, 2].imshow(diff_tensor.sum(2), cmap='jet', vmin=0, vmax=ori[0].permute(1, 2, 0).cpu().max())
 ax[1, 2].set_title('Difference Real/Decoded', fontsize= 18)
 ax[1, 2].axis('off')
@@ -69,9 +73,8 @@ fig.text(0.75, 0.7, ssim_score, ha="center", va="center", fontsize=20)
 fig.colorbar(ax[1, 2].imshow(diff_tensor.sum(2), cmap='jet', vmin=0, vmax=ori[0].permute(1, 2, 0).cpu().max()))
 fig.subplots_adjust(hspace=0.2, wspace=0.1)
 
+# ---------- speichern des plots ----------------
 antwort = "ja"
-
-# Wenn die Antwort "Ja" lautet, speichern Sie die Figur ab
 if antwort.lower() == "ja":
 
     pfad = "/home/yv312705/Code/diffusion_autoenc/eval_plots/mri_nine/autoencoder/"

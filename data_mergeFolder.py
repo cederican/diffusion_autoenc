@@ -2,6 +2,9 @@ import os
 from shutil import copyfile
 from PIL import Image
 
+# --------------------- helper function to merge folder into one big folder for a trainingdataset -------------------------------
+
+
 def merge_png_folders(folder1, folder2, folder3, target_folder1, target_folder2, target_folder3):
     """
     Merges two folders containing PNG files into one folder,
@@ -10,10 +13,8 @@ def merge_png_folders(folder1, folder2, folder3, target_folder1, target_folder2,
     #if not os.path.exists(target_folder):
     #   os.makedirs(target_folder)
 
-    # List all PNG files in the first folder
     files1 = [f for f in sorted(os.listdir(folder1)) if f.endswith('.png')][:5000]
 
-    # List all PNG files in the second folder
     files2 = [f for f in sorted(os.listdir(folder2)) if f.endswith('.png')][15000:20000]
 
     files3 = [f for f in sorted(os.listdir(folder3)) if f.endswith('.png')][30200:35200]
@@ -24,7 +25,7 @@ def merge_png_folders(folder1, folder2, folder3, target_folder1, target_folder2,
 
     #files6 = [f for f in sorted(os.listdir(folder6)) if f.endswith('.png')]
 
-    # Copy files from folder1 to target folder with numbered file names
+    
     for i, file1 in enumerate(files1):
         source_file = os.path.join(folder1, file1)
         image = Image.open(source_file)
@@ -33,7 +34,6 @@ def merge_png_folders(folder1, folder2, folder3, target_folder1, target_folder2,
         resized_image.save(target_file)
         #copyfile(source_file, target_file)
     
-    # Copy files from folder2 to target folder with numbered file names
     for i, file2 in enumerate(files2):
         source_file = os.path.join(folder2, file2)
         image = Image.open(source_file)

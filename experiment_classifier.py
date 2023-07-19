@@ -162,7 +162,7 @@ class ClsModel(pl.LightningModule):
                                       data_paths['celebahq_anno'],
                                       do_augment=True)
         
-        # load mri dataset ##############################################################################
+        # ------------------------ load mri dataset -------------------------
 
         elif self.conf.manipulate_mode == ManipulateMode.mri:
             return MriAttrDataset(data_paths['mrilmdb'],
@@ -244,13 +244,6 @@ class ClsModel(pl.LightningModule):
         assert self.conf.batch_size % ws == 0
         return self.conf.batch_size // ws
     
-    ################################# integrate the edge loss
-    def edge_loss(self, cond, pred):
-
-        cond_gradients = torch.autograd.grad(outputs=pred_softmax[:,1], inputs=cond, grad_outputs=torch.ones_like(pred_softmax[:,1]), create_graph=True, retain_graph=True, only_inputs=True)[0]
-        edge_loss = torch.mean(torch.abs(cond_gradients))
-        return edge_loss
-    
 
     def training_step(self, batch, batch_idx):
         self.ema_model: BeatGANsAutoencModel
@@ -305,24 +298,8 @@ class ClsModel(pl.LightningModule):
         if self.conf.manipulate_loss == ManipulateLossType.bce:
             loss = F.binary_cross_entropy_with_logits(pred, gt)
 
-            #cond_gradients = torch.autograd.grad(outputs=pred, inputs=cond, grad_outputs=torch.ones_like(pred), create_graph=True, retain_graph=True, only_inputs=True)[0]
-            #edge_loss = torch.mean(torch.abs(cond_gradients))
-
-            #total_loss = loss + edge_loss* 10
-
-            #diff = torch.abs(cond[:, 1:] - cond[:, :-1])
-
-            #edge_loss = torch.mean(diff)
-
-            #total_loss = loss + edge_loss
-
             if pred_ema is not None:
                 loss_ema = F.binary_cross_entropy_with_logits(pred_ema, gt)
-
-                #cond_gradients_ema = torch.autograd.grad(outputs=pred_ema, inputs=cond, grad_outputs=torch.ones_like(pred_ema), create_graph=True, retain_graph=True, only_inputs=True)[0]
-                #edge_loss_ema = torch.mean(torch.abs(cond_gradients_ema))
-
-                #total_loss_ema = loss_ema + edge_loss_ema
 
         elif self.conf.manipulate_loss == ManipulateLossType.mse:
             loss = F.mse_loss(pred, gt)
@@ -331,11 +308,8 @@ class ClsModel(pl.LightningModule):
         else:
             raise NotImplementedError()
 
-        #self.scheduler.step()
-        #print(self.scheduler.get_lr())
 
         self.log('loss', loss)
-        #self.log('edge_loss', edge_loss)
         self.log('loss_ema', loss_ema)
         return loss
 

@@ -1,8 +1,8 @@
 from templates import *
 from templates_latent import *
 
+# ------------- train for unconditioned sampling. not important in this thesis --------------------
 if __name__ == '__main__':
-    
     
     
     gpus = [0, 1]

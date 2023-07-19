@@ -5,7 +5,7 @@ from templates import *
 import netron
 import torch
 
-
+# ----------------------- function to visualize the DiffAE net -------------------
 model = BeatGANsAutoencModel(BeatGANsAutoencConfig)
 checkpoint = torch.load('/home/yv312705/Code/diffusion_autoenc/checkpoints/mri_autoenc/last.ckpt')
 model.load_state_dict(checkpoint['state_dict'], strict=False)

@@ -11,6 +11,7 @@ from torchvision.transforms import functional as trans_fn
 from tqdm import tqdm
 import os
 
+# ---------------------------- import function to convert png to lmdb for DiffAE input -----------------------
 
 def resize_and_convert(img, size, resample, quality=100):
     img = trans_fn.resize(img, size, resample)

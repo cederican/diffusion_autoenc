@@ -61,7 +61,7 @@ def autoenc_base():
 ##############################################################################################################
 '''
 '''
-configuration function for 128x128 MRI scans
+# ----------------- configuration function for 128x128 MRI scans -----------------------
 '''
 
 def mri_autoenc():
@@ -82,7 +82,7 @@ def mri_autoenc():
     return conf
 
 '''
-pretrain function, if checkpoints are available
+# ---------------- pretrain function, if checkpoints are available
 '''
 def pretrain_mri():
     conf = mri_autoenc()
@@ -94,7 +94,7 @@ def pretrain_mri():
     return conf
 
 '''
-ddpm config function
+# -------------------- ddpm config function
 '''
 def mri_ddpm():
     conf = ddpm()

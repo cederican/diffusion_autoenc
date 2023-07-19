@@ -7,7 +7,7 @@ import cv2
 from tqdm import tqdm
 from PIL import Image, ImageEnhance
 
-
+# ---------------------- Convert dicom files from FASTMRI structure in png files ----------------------------------
 
 def convert_dicom_to_png(input_folder, output_folder1, output_folder2, output_folder3 ,output_folder4 ,output_folder5 ,sequence_name1, sequence_name2, sequence_name3, sequence_name4, sequence_name5):
 
@@ -52,13 +52,12 @@ def convert_dicom_to_png(input_folder, output_folder1, output_folder2, output_fo
                     
                     if hasattr(ds, 'pixel_array'):
                     
-                        # Überprüfe, ob die aktuelle DICOM-Datei die gewünschte Bildsequenz enthält
                         if ds.SeriesDescription == sequence_name1:
-                            # Extrahiere das DICOM-Bild als Numpy-Array
+
                             pixel_array = ds.pixel_array.astype('float32')
                             pixel_array /= np.max(pixel_array)
                             img = Image.fromarray(np.uint8(pixel_array*255))
-                            # Speichere das DICOM-Bild als PNG-Datei im Ausgabeverzeichnis
+
                             index_str1 = "{:05d}".format(index1)
                             slice_name1 = f"{index_str1}.png"
                             output_path = os.path.join(output_folder1, slice_name1)
@@ -67,13 +66,11 @@ def convert_dicom_to_png(input_folder, output_folder1, output_folder2, output_fo
                             index1 += 1
 
                         if ds.SeriesDescription == sequence_name2:
-                            # Extrahiere das DICOM-Bild als Numpy-Array
+                            
                             pixel_array2 = ds.pixel_array.astype('float32')
                             pixel_array2 /= np.max(pixel_array2)
-
                             img2 = Image.fromarray(np.uint8(pixel_array2*255))
 
-                            # Speichere das DICOM-Bild als PNG-Datei im Ausgabeverzeichnis
                             index_str2 = "{:05d}".format(index2)
                             slice_name2 = f"{index_str2}.png"
                             output_path2 = os.path.join(output_folder2, slice_name2)
@@ -82,28 +79,24 @@ def convert_dicom_to_png(input_folder, output_folder1, output_folder2, output_fo
                             index2 += 1
 
                         if ds.SeriesDescription == sequence_name3:
-                            # Extrahiere das DICOM-Bild als Numpy-Array
+                            
                             pixel_array3 = ds.pixel_array.astype('float32')
                             pixel_array3 /= np.max(pixel_array3)
-
                             img3 = Image.fromarray(np.uint8(pixel_array3*255))
 
-                            # Speichere das DICOM-Bild als PNG-Datei im Ausgabeverzeichnis
                             index_str3 = "{:05d}".format(index1)
                             slice_name3 = f"{index_str3}.png"
                             output_path3 = os.path.join(output_folder3, slice_name3)
                             img3.save(output_path3)
                             #print(f"Die Slice {exec_file} wurde als {slice_name2} gespeichert.")
-                            index1 += 1
+                            index3 += 1
 
                         if ds.SeriesDescription == sequence_name4:
-                            # Extrahiere das DICOM-Bild als Numpy-Array
+                            
                             pixel_array4 = ds.pixel_array.astype('float32')
                             pixel_array4 /= np.max(pixel_array4)
-
                             img4 = Image.fromarray(np.uint8(pixel_array4*255))
 
-                            # Speichere das DICOM-Bild als PNG-Datei im Ausgabeverzeichnis
                             index_str4 = "{:05d}".format(index4)
                             slice_name4 = f"{index_str4}.png"
                             output_path4 = os.path.join(output_folder4, slice_name4)
@@ -112,26 +105,24 @@ def convert_dicom_to_png(input_folder, output_folder1, output_folder2, output_fo
                             index4 += 1
 
                         if ds.SeriesDescription == sequence_name5:
-                            # Extrahiere das DICOM-Bild als Numpy-Array
+                    
                             pixel_array5 = ds.pixel_array.astype('float32')
                             pixel_array5 /= np.max(pixel_array5)
-
                             img5 = Image.fromarray(np.uint8(pixel_array5*255))
 
-                            # Speichere das DICOM-Bild als PNG-Datei im Ausgabeverzeichnis
                             index_str5 = "{:05d}".format(index4)
                             slice_name5 = f"{index_str5}.png"
                             output_path5 = os.path.join(output_folder5, slice_name5)
                             img5.save(output_path5)
                             #print(f"Die Slice {exec_file} wurde als {slice_name2} gespeichert.")
-                            index4 += 1
+                            index5 += 1
                     else:
                         continue
 
     print("Vorgang abgeschlossen.")
 
 
-# Beispielaufruf der Funktion
+# ----------------- Angabe der Speicherorte und Eingaefolder ------------------------
 input_folder = '/work/yv312705/NYU_data/knee_mri_clinical_seq'
 output_folder1 = '/home/yv312705/Code/diffusion_autoenc/FastMri/test_classifier/a_cor_pd'
 output_folder2 = '/home/yv312705/Code/diffusion_autoenc/FastMri/test_classifier/b_cor_pd_fs'
