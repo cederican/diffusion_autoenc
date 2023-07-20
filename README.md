@@ -23,8 +23,8 @@ pip install -r requirements.txt
 
 We do not own any of the following datasets. We provide the LMDB ready-to-use dataset for the sake of convenience.
 
-- [MRI_COR]
-- [MRI_COR2]
+- [MRI_COR] in Coscine M&M
+- [MRI_COR2] in Coscine M&M
 
 The directory tree should be:
 
